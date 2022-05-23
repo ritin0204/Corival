@@ -1,0 +1,18 @@
+{% extends 'corival/layout.html' %}
+
+{% block title %} Home {% endblock %}
+
+{% block body %}
+<h1>Home</h1>
+{% if user.is_authenticated %}
+<h2>{{comp.name}}</h2>
+{{comp.start_time}}</br>
+{{ comp.end_time }}
+<p>{{ comp.description}}</p>
+<p>{{ comp.createdBy }}</p>
+<a href="{% url 'logout-view' %}">Logout</a>
+{% else %}
+<a href="{% url 'login-view' %}">Login</a>
+<a href="{% url 'register-view' %}">Register</a>
+{% endif %}
+{% endblock %}

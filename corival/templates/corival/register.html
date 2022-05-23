@@ -1,0 +1,44 @@
+{% extends "corival/layout.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block body %}
+{% if error %}
+<div id="error"><p>
+    {{error}}
+</p></div>
+{% endif %}
+<h3>SignUp</h3>
+    <form action="{% url 'register-view' %}" method="post">
+        {% csrf_token %}
+        <label for="username"><p>Username</p>
+            <input type="text" name="username" id="username" required>
+        </label>
+        <label for="email"><p>Email</p>
+            <input type="email" name="email" id="email" required>
+        </label>
+        <label for="firstName"><p>First Name</p>
+            <input type="text" name="firstName" id="firstName" required>
+        </label>
+        <label for="lastName"><p>Last Name</p>
+            <input type="text" name="lastName" id="lastName">
+        </label>
+        <label for="password"><p>Password</p>
+            <input type="password" name="password" id="password" required>
+        </label>
+        <label for="confirm-pass"><p>Re-Enter Password</p>
+            <input type="password" name="confirm-pass" id="confirm-pass" required>
+        </label>
+        <fieldset>
+            <legend><p>You are Here?</p></legend>
+              <label for="purpose">
+                  <input type="radio" name="purpose" id="purpose" value="False" checked>to Participate.
+              </label>
+              <label for="purpose">
+                  <input type="radio" name="purpose" id="purpose" value="True">to Hire.
+              </label>
+          </fieldset>
+        <input type="submit" value="SignUp">
+    </form>
+    <p>Already have an Account? <a href="{% url 'login-view' %}">click here</a></p>
+{% endblock %}

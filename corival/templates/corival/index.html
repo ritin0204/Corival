@@ -1,0 +1,20 @@
+{% extends 'corival/layout.html' %}
+
+{% block title %} Home {% endblock %}
+
+{% block body %}
+<h1>Home</h1>
+{% if user.is_authenticated %}
+{% for comp in ongoing %}
+    <h2>{{comp.name}}</h2>
+    {{comp.start_time}}</br>
+    <p>{{ comp.end_time }}</p>
+    {{comp.id}}
+    <a href="{% url 'competition' comp.id %}">Know More</a>
+{% endfor %}
+<a href="{% url 'logout-view' %}">Logout</a>
+{% else %}
+<a href="{% url 'login-view' %}">Login</a>
+<a href="{% url 'register-view' %}">Register</a>
+{% endif %}
+{% endblock %}
