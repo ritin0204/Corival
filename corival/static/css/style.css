@@ -1,3 +1,322 @@
-#loginhead {
+:root {
+    --first-color:rgb(54, 42, 220);
+    --second-color:white;
+}
+body{
+    margin-top: -8px;
+    background-color: rgb(255, 242, 226);
+    width: 100vw;
+    min-height: 100%;
+    font-family: Arial, Helvetica, sans-serif;
+    box-sizing: border-box;
+}
+#container {
+    max-width: 1000px;
+    min-width: inherit;
+    background-color: rgb(235, 231, 231);
+    margin: -50px auto auto auto;
+    padding: 50px;
+    min-height: 100vh;
+    height: fit-content;
+}
+footer{
     background-color: black;
+    color: rgba(253, 254, 255, 0.609);
+    font-size: 1rem;
+    width: 100vw;
+    height: 15vh;
+}
+.error {
+    margin: auto;
+    border: 2px solid rgb(247, 15, 7);
+    border-radius: 12px;
+    background-color: rgb(249, 228, 228);
+    text-align: center;
+    color: rgb(255, 2, 2);
+}
+/* All login and register page css is here */
+
+/* Navigation bar All Css */
+nav{
+    position: sticky;
+    left: 0;
+    top: 0;
+    margin-left: -8px;
+    margin-bottom: 50px;
+    background-color: black;
+    width: 100vw;
+    min-width: 320px;
+    height:60px;
+    color: white;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    align-items: center;
+    font-size: 1rem;
+    z-index: 10;
+}
+#nav-items a {
+    text-decoration: none;
+    letter-spacing: 1px;
+    color: var(--second-color);
+}
+#nav-items #createcontestlink {
+    font-size: 1rem;
+    letter-spacing: 1px;
+    color: white;
+    border: none;
+    background-color: black;
+    cursor: pointer;
+    border-radius: 12px;
+    padding: 0.5em;
+}
+#nav-items{
+    width: 70vw;
+    display: flex;
+    justify-content: space-around;
+    align-items: baseline;
+}
+/* All Index Css will Be here */
+#index label {
+    font-size: larger;
+    font-weight: bold;
+}
+#index select {
+    padding: 10px;
+    border-radius: 8px;
+}
+#displayquestion{
+    display: none;
+}
+/* Profile Page Css Will be here */
+#profile {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    flex-direction: column;
+}
+#profile-div{
+    margin: auto;
+    border: 2px solid rgb(148, 145, 145);
+    background-color: rgb(223, 218, 218);
+    border-radius: 12px;
+    padding: 20px;
+    width: 100%;
+    max-width: 700px;
+    margin-bottom: 20px;
+}
+.logout {
+    text-decoration: none;
+    padding: 10px;
+    width: 100%;
+    max-width: 400px;
+    margin: auto;
+    text-align: center;
+    background-color: rgb(224, 229, 234);
+    border: 1px solid rgb(38, 37, 37);
+    font-weight: 700;
+    color: black;
+}
+
+/* All Bell?Notificatios CSS will be Here */
+#notification{
+    background-color: rgb(242, 236, 236);
+    min-width: 320px;
+    max-height: 80px;
+    border: none;
+    padding: 10px;
+    margin: 20px 20px 20px -50px;
+    list-style: none;
+    
+    border-radius: 12px;
+    color: black;
+    -webkit-box-shadow: 0px 0px 10px 0.2px rgba(125,110,125,0.3);
+    -moz-box-shadow: 0px 0px 10px 0.2px rgba(125,110,125,0.3);
+    box-shadow: 0px 0px 10px 0.2px rgba(125,110,125,0.3);
+    text-transform: capitalize;
+}
+#notification a {
+    text-decoration: none;
+}
+
+/* All competition lists Css will be here */
+#list-items h2{
+    background-color: rgb(255, 54, 54);
+    color: white;
+    padding: 10px 30px 10px 30px;
+    width: fit-content;
+    text-align: center;
+}
+.card-div {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    flex-direction: row;
+}
+.card {
+    flex: 0 1 auto;
+    background-color: rgb(255, 255, 255);
+    border-radius: 12px;
+    border: none;
+    padding: 15px;
+    margin: 30px;
+    width: 300px;
+    height: 200px;
+    -webkit-box-shadow: 0px 0px 10px 0.3px rgba(125,110,125,0.3);
+    -moz-box-shadow: 0px 0px 10px 0.3px rgba(125,110,125,0.3);
+    box-shadow: 0px 0px 10px 0.3px rgba(125,110,125,0.3);
+}
+.card h3 {
+    font-weight: 300;
+    font-size: 1.4rem;
+    text-transform: capitalize;
+}
+.card a{
+    justify-self: center;
+    align-self: flex-end;
+    text-decoration: none;
+    background-color: rgb(56, 56, 251);
+    color: white;
+    padding: 10px;
+    border-radius: 8px;
+    margin: auto;
+}
+ /* Contest.html Css */
+ #contest-details{
+    background-color: rgb(255, 255, 255);
+    border-radius: 12px;
+    border: none;
+    padding: 15px;
+    margin: 30px;
+    -webkit-box-shadow: 0px 0px 10px 0.3px rgba(125,110,125,0.3);
+    -moz-box-shadow: 0px 0px 10px 0.3px rgba(125,110,125,0.3);
+    box-shadow: 0px 0px 10px 0.3px rgba(125,110,125,0.3);
+ }
+ .center {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+ }
+ .success-button {
+    width: fit-content;
+    max-width: 250px;
+    background-color: rgb(89, 209, 49);
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-size: larger;
+    font-weight: 600;
+    margin:0 auto;
+ }
+ .success-button:hover {
+    transform: scale(1.1);
+ }
+ #green-circle{
+    text-align: center;
+    border-radius: 8px;
+    font-size: 2.5rem;
+    padding: 10px;
+ }
+ /*All Create contest page css will be here*/
+ #createcontestsection {
+    width:70%;
+    height:100%;
+    min-width: 230px;
+    margin: auto;
+    text-align: center;
+    padding: 0;
+    border-radius: 12px;
+ }
+ #createcontestsection h1{
+    background-color: rgb(53, 182, 20);
+    padding: 15px;
+    width: fit-content;
+    color: white;
+    margin: auto;
+    margin-bottom: 2rem;
+ }
+ #createcontestform{
+    height: fit-content;
+    width: inherit;
+    font-weight: 600;
+    font-size: 1rem;
+    padding: 2rem;
+    margin: auto;
+ }
+ #createcontestform input,#createcontestform textarea {
+    min-width: 200px;
+    width: 100%;
+    padding: 7px;
+    margin: 10px 0 15px 0;
+    border: none;
+    border-left: 5px solid rgb(44, 248, 44) ;
+    background-color: rgb(44, 248, 44,0.2);
+    border-radius: 4px;
+ }
+ #createcontestform input[type="range"] {
+    max-width: 200px;
+ }
+ #createcontestform input[type="submit"] {
+    background-color: rgb(0, 236, 75);
+    border: none;
+ }
+ #createcontestform output{
+     background-color: rgb(0, 236, 75);
+     width: 1rem;
+     height: 1rem;
+     border-radius: 4px;
+     color: white;
+     font-size: large;
+     padding: 0.6rem;
+     margin-top: -10px;
+ }
+ /* All Quiz Related CSS will be Here */
+#quiz-form{
+    position: relative;
+    box-sizing: border-box;
+}
+#slides {
+    position: relative;
+}
+#finish-test{
+   align-self: flex-end;
+}
+.question-div{
+    position: relative;
+    background-color: white;
+    font-size: 1.2em;
+    padding: 20px;
+    border-radius: 8px;
+    margin:auto;
+    width: 100%;
+    height: fit-content;
+    margin:30px 0;
+    box-sizing: border-box;
+}
+#clock{
+    position: sticky;
+    top:0;
+    background-color: white;
+    border:8px ridge rgb(228, 42, 42);
+    padding: 10px 20px;
+    width: fit-content;
+    border-radius: 8px;
+    margin: 20px auto;
+    font-weight: 600;
+}
+.quiz-option {
+    position: relative;
+    background-color: rgb(255, 255, 255);
+    margin: 0.3em;
+    font: inherit;
+    width: 1.15em;
+    height: 1.15em;
+    border: 0.15em solid black;
+    border-radius: 50%;
+    transform: translateY(-0.080em);
+    z-index: 2;
 }

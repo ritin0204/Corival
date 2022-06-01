@@ -1,4 +1,3 @@
-from pyexpat import model
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 
@@ -16,16 +15,18 @@ class User(AbstractUser):
     is_manager = models.BooleanField(default=False)
     rating = models.IntegerField(null=True)
     bio = models.TextField(null=True)
-    # user_pic = models.ImageField()
 
     def serialize(self):
         return {
             'username':self.username,
             'email': self.email,
+            'bio': self.bio,
             'fullName': self.get_full_name(),
             'isAdmin': self.is_superuser,
             'isManager':self.is_manager,
-            'rating':self.rating
+            'rating':self.rating,
+            'dateJoined':self.date_joined,
+            'lastLogin' : self.last_login
         }
 
 
@@ -42,12 +43,10 @@ class Questions(models.Model):
         return {
             'id':self.id,
             'statement':self.statement,
-            'options1':self.options1,
-            'options2':self.options2,
-            'options3':self.options3,
-            'options4':self.options4,
-            'right_answer':self.right_answer,
-            'category':self.category
+            'option1':self.options1,
+            'option2':self.options2,
+            'option3':self.options3,
+            'option4':self.options4,
         }
 
 class Competition(models.Model):
@@ -62,20 +61,44 @@ class Competition(models.Model):
     description = models.TextField(null=True)
     participients = models.ManyToManyField("User",related_name='participient')
     questions = models.ManyToManyField("Questions",related_name='questions')
+    no_of_questions = models.IntegerField(default=20)
 
     def serialize(self):
         return {
+            'id':self.id,
             'name':self.name,
-            'createdBy':self.createdBy,
-            'startTime':self.startTime,
-            'endTime':self.endTime,
+            'createdBy':self.createdBy.username,
+            'startTime':self.start_time,
+            'endTime':self.end_time,
             'duration' :self.duration,
             'participients':[user.username for user in self.participients.all()],
-            'questions':[que.id for que in self.questions.all()]
+            'archive':self.archive,
+            'description':self.description,
+            'noOfQuestion':self.no_of_questions,
         }
 
 class CompResponse(models.Model):
     compId = models.ForeignKey("Competition",on_delete=models.CASCADE)
     userId = models.ForeignKey("User",on_delete=models.CASCADE)
     score = models.IntegerField(blank=False)
-    
+
+    def serialize(self):
+        return {
+            "userName": self.userId.username,
+            "score":self.score
+        }
+
+class Notifications(models.Model):
+    message = models.TextField()
+    message_url = models.TextField()
+    read = models.BooleanField(default=False)
+    user = models.ForeignKey("User",on_delete=models.CASCADE)
+    created_time = models.DateTimeField(auto_now_add=True,editable=False)
+
+    def serialize(self):
+        return {
+            "messege": self.message,
+            "message_url": self.message_url,
+            "created_time":self.created_time,
+            "read" : self.read
+        }

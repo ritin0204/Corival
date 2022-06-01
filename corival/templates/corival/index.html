@@ -1,20 +1,23 @@
 {% extends 'corival/layout.html' %}
-
+{% load static %}
 {% block title %} Home {% endblock %}
 
 {% block body %}
-<h1>Home</h1>
-{% if user.is_authenticated %}
-{% for comp in ongoing %}
-    <h2>{{comp.name}}</h2>
-    {{comp.start_time}}</br>
-    <p>{{ comp.end_time }}</p>
-    {{comp.id}}
-    <a href="{% url 'competition' comp.id %}">Know More</a>
-{% endfor %}
-<a href="{% url 'logout-view' %}">Logout</a>
-{% else %}
-<a href="{% url 'login-view' %}">Login</a>
-<a href="{% url 'register-view' %}">Register</a>
-{% endif %}
+<div id="index" class="center">
+    <label for="contestType">SELECT HERE:</label> <br>
+    <select name="contest-type" id="contestType" onchange="loadIndexContent(this.value)">
+        <option value="0" hidden selected>Select Here</option>
+        <option value="all">All Competitions</option>
+        <option value="archived">Archived Competitions</option>
+        <option value="ongoing">Ongoing Competitions</option>
+        <option value="challenges">challenges (Comeing Soon)</option>
+        <option value="practice">Practice (Coming Soon)</option>
+    </select>
+</div>
+<section id="list-items" class="center">
+</section>
+
+    {% block script %}
+        <script src="{% static 'js/index.js' %}"></script>
+    {% endblock %}
 {% endblock %}

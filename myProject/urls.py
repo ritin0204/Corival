@@ -19,5 +19,6 @@ from django.urls import path ,include
 
 urlpatterns = [
     path('',include('corival.urls')),
+    # path('corival/',include('corival.urls')),
     path('admin/', admin.site.urls),
 ]

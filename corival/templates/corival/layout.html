@@ -10,7 +10,36 @@
     <title>{% block title %} {% endblock %}</title>
 </head>
 <body>
-    {% block body %}
+    <nav>
+        <div id="logo">
+            <img src="{% static 'img/corival-logos_transparent.png' %}" width="150px" alt="Corival">
+        </div>
+        <div id="nav-items">
+            <a href="{% url 'index' %}" id="index-link">Home</a>
+            <a href="{% url 'notifications' %}" id="bell-link">Updates</a>
+            {% if request.user.is_authenticated %}
+                <a href="{% url 'get_user' request.user.username %}">{{request.user.username}}</a>
+            {% else %}
+                <a href="{% url 'login-view' %}">Login</a>
+            {% endif %}
+            {% if request.user.is_manager %}
+                <a id="createcontestlink" href="{% url 'add_contest' %}" style="background-color: aliceblue;color: black;">Create Contest</a>
+            {% elif request.user.is_superuser %}
+                <a id="createcontestlink" href="{% url 'add_contest' %}" style="background-color: aliceblue;color: black;">Create Contest</a>
+            {% else %}
+                <!-- <button id="createcomplink" style="background-color: aliceblue;color: black">Create Challange</button> -->
+            {% endif %}
+        </div>
+    </nav>
+    <div id="container">
+        {% block body %}
+        {% endblock %}
+    </div>
+    <script src="{% static 'js/index.js' %}"></script>
+    {% block script %}
     {% endblock %}
+    <footer class="center">
+        <p>Welcome! My name is Footer. I contain some addition information and links related to website.</p>
+    </footer>
 </body>
 </html>
