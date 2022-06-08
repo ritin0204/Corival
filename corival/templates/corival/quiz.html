@@ -1,6 +1,6 @@
 {% extends 'corival/layout.html' %}
 {% load static %}
-{% block title %} {{comp.name}} {% endblock %}
+{% block title %} {{comp.id}} {% endblock %}
 
 {% block body %}
 <div id="Instructions">
@@ -16,7 +16,11 @@
 </div>
 <div id="displayquestion">
     <div id="clock"><span id="clockminute">00</span> : <span id="clocksec">00</span></div>
-    <form action="{% url 'start-competition' comp.id %}" method="post" id="quizform">  
+    {% if comp.name %}
+    <form action="{% url 'start-competition' comp.id %}" method="post" id="quizform">
+    {% else %}
+    <form action="{% url 'result-practice' comp.id %}" method="post" id="quizform">
+    {% endif %}
         <div id="slides">
             {% for que in questions %}
             <div id="slide{{forloop.counter}}" class="question-div card" >
@@ -27,6 +31,7 @@
                 <input type="radio" name="{{que.id}}" class="quiz-option" value="{{que.option3}}"> <span>{{que.option3}}</span></br>
                 <input type="radio" name="{{que.id}}" class="quiz-option" value="{{que.option4}}"> <span>{{que.option4}}</span></br>
             </div>
+            <p>{{que.rans}}</p>
             {% endfor %}
         </div>
         <div class="center">

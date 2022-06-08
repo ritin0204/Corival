@@ -5,7 +5,7 @@
 {% block body %}
 <section id="createcontestsection">
     <h1>Create Contest</h1>
-    <form action="{% url 'add_contest' %}" class="center card" id="createcontestform" method="post">
+    <form action="{% url 'add_quiz' %}" class="center card" id="createcontestform" method="post">
         <label for="nameOfContest">Title: </label>
         <input type="text" id="nameOfContest" name="name" required>
         <label for="start-time">Start Time: </label>

@@ -47,12 +47,12 @@ class Questions(models.Model):
             'option2':self.options2,
             'option3':self.options3,
             'option4':self.options4,
+            'rans':self.right_answer
         }
 
 class Competition(models.Model):
     name = models.CharField(max_length=150,blank=False,unique=True)
     is_challenge = models.BooleanField(default=False)
-    is_practice = models.BooleanField(default=False)
     createdBy = models.ForeignKey("User",on_delete=models.CASCADE)
     start_time = models.DateTimeField(blank=False)
     end_time = models.DateTimeField(blank=False)
@@ -75,6 +75,21 @@ class Competition(models.Model):
             'archive':self.archive,
             'description':self.description,
             'noOfQuestion':self.no_of_questions,
+        }
+
+class Practice(models.Model):
+    user = models.ForeignKey("User",on_delete=models.CASCADE)
+    duration = models.DurationField(blank=False)
+    questions = models.ManyToManyField("Questions",related_name='practicequestions')
+    no_of_questions = models.IntegerField(default=20)
+    score = models.IntegerField(blank=True,null=True)
+
+    def serialize(self):
+        return {
+            'id':self.id,
+            'duration' :self.duration,
+            'noOfQuestion':self.no_of_questions,
+            'score':self.score
         }
 
 class CompResponse(models.Model):

@@ -7,7 +7,7 @@ from django.db import IntegrityError
 from django.shortcuts import redirect, render
 from django.contrib.auth import login,logout,authenticate
 from django.contrib.auth.decorators import login_required
-from .models import User,Competition,CompResponse,Questions,Notifications
+from .models import Practice,User,Competition,CompResponse,Questions,Notifications
 
 # Create your views here.
 def index(request):
@@ -55,6 +55,66 @@ def competitions(request,type):
 # def add_challenge(request):
     # pass
 #if you creating challenge send value is_challenge = true and valid opponent id
+
+@login_required
+@csrf_exempt
+def add_practice(request):
+    if request.method == "POST":
+        topics = request.POST.getlist('topics')
+        no_of_questions = int(request.POST["noOfQuestions"])
+        print(topics, no_of_questions)
+        minutes = no_of_questions*1.75
+        duration = datetime.timedelta(minutes=minutes)
+        practice = Practice.objects.create(user=request.user,duration=duration,no_of_questions=no_of_questions)
+        if topics == []:
+            questions = Questions.objects.all()[0:no_of_questions+1]
+        else:
+            questions = Questions.objects.filter(category=str(topics[0]))
+            #add [0:no_of_questions]
+        for que in questions:
+            practice.questions.add(que)
+        practice.save()
+        return render(request,"corival/quiz.html",{
+            "comp":practice,
+            "totalQuestions":practice.no_of_questions,
+            "duration":practice.duration,
+            "questions":[question.serialize() for question in questions]
+        })
+    else:
+        return render(request,"corival/practice.html")
+
+@login_required
+@csrf_exempt
+def result_practice(request,pracId):
+    try:
+        practice = Practice.objects.get(id=pracId)
+    except:
+        return render(request,"corival/error.html",{
+            "error" : "No Such Session Found."
+        })
+    questions = practice.questions.all()
+    if request.method=="POST":
+        total = questions.count()
+        userPoint = 0
+        for que in questions:
+            userAns = str(request.POST[str(que.id)])
+            if str(que.right_answer)==userAns:
+                userPoint+=1
+        userScore = (userPoint//total)*100
+        practice.score = userScore
+        practice.save()
+        update = Notifications.objects.create(message="You Appeared in Practice Session",message_url=f"practice/{practice.id}",user=request.user)
+        update.save()
+    if practice.score is None:
+        return render(request,"corival/error.html",{
+            "error" : "You Haven't Submitted Any Response."
+        })
+    return render(request,"corival/practiceResult.html",{
+        "noOfQuestion":questions.count(),
+        "practice" : practice,
+        "questions" : [question.serialize() for question in questions]
+    })
+
 @login_required
 @csrf_exempt
 def add_contest(request):
@@ -65,7 +125,7 @@ def add_contest(request):
         end = request.POST["endTime"]
         description = request.POST["description"]
         no_of_questions = int(request.POST["noOfQuestions"])
-
+        
         minutes = no_of_questions*1.75
         duration = datetime.timedelta(minutes=minutes)
         try:
@@ -93,6 +153,12 @@ def add_contest(request):
             return render(request,"corival/error.html",{"error":f"{str(e)}"})
     else:
         return render(request,"corival/createComp.html")
+
+@login_required
+@csrf_exempt
+def all_Practices(request):
+    practices = Practice.objects.filter(user=request.user.id)
+    return JsonResponse([practice.serialize() for practice in practices],safe=False)
 
 @login_required
 def get_competition(request,compId):

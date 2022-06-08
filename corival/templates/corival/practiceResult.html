@@ -1,0 +1,33 @@
+{% extends 'corival/layout.html' %}
+{% load static %}
+{% block title %} Practice#{{practice.id}} {% endblock %}
+
+{% block body %}
+<div id="contest-details">
+    <h1>Practice#{{practice.id}}</h1>
+    <p><strong>Duration: </strong>{{practice.duration}}</p>
+    <p><strong>Total Questions: </strong>{{noOfQuestion}}</p>
+    <h2>Your Score</h2>
+    <div id="green-circle" class="success-button center">
+        <strong>{{practice.score}}%</strong>
+    </div>
+</div>
+<div>
+    <div id="slides">
+        {% for que in questions %}
+        <div id="slide{{forloop.counter}}" class="question-div card" >
+            <p>{{forloop.counter}}. {{que.statement}}</p>
+            <input type="radio" name="{{que.id}}" value="" hidden checked>
+            <input type="radio" name="{{que.id}}" class="quiz-option" value="{{que.option1}}" disabled> <span>{{que.option1}}</span></br>
+            <input type="radio" name="{{que.id}}" class="quiz-option" value="{{que.option2}}" disabled> <span>{{que.option2}}</span></br>
+            <input type="radio" name="{{que.id}}" class="quiz-option" value="{{que.option3}}" disabled> <span>{{que.option3}}</span></br>
+            <input type="radio" name="{{que.id}}" class="quiz-option" value="{{que.option4}}" disabled> <span>{{que.option4}}</span></br>
+        </div>
+        <p>Answer : {{que.rans}}</p>
+        {% endfor %}
+    </div>
+</div>
+{% block script %}
+    <script src="{% static 'js/index.js' %}"></script>
+{% endblock %}
+{% endblock %}

@@ -10,7 +10,9 @@ urlpatterns = [
     path('notifications',views.notifications,name='notifications'),
     #All kinds of Contest
     path('competitions/<str:type>',views.competitions,name='contest_type'),
-    # #Competition-details
+    #all practices
+    path('practices/all',views.all_Practices,name='all-practices'),
+    #Competition-details
     path('competition/<int:compId>',views.get_competition,name='competition'),
     #Create contest
     path('competition/create',views.add_contest,name='add_contest'),
@@ -18,12 +20,12 @@ urlpatterns = [
     #Path to start and submit competition quiz
     path('competition/start/<int:compId>',views.startContest,name='start-competition'),
     #create/challenge
-    path('competition/create',views.add_contest,name='add_contest'),
-    # #Get Questions to practice(get request) , Submit answersand get score(by post request)
-    # path('practice/',views.practice,name='practice'),
+    # path('competition/create',views.add_contest,name='add_contest'),
+    #Get Questions to practice(get request) , Submit answersand get score(by post request)
+    path('practice/',views.add_practice,name='create-practice'),
 
-    # #Challenge-details/post to submit challenge
-    # path('challenge/<int:compId>',views.get_competition,name='competition'),
+    #Challenge-details/post to submit challenge
+    path('practice/<int:pracId>',views.result_practice,name='result-practice'),
 
     # #Accept challenge
     # path('challenge/accepted',views.add_challenge,name='add_contest'),

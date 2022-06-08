@@ -1,4 +1,4 @@
-const startcontest = document.querySelector("#startcompetition")
+let startcontest = document.querySelector("#startcompetition")
 document.addEventListener("DOMContentLoaded",()=>{
     document.querySelector("#startcompetition").addEventListener("click",()=> startCompetition(startcontest.value))
 });
@@ -10,25 +10,48 @@ function loadIndexContent(type="all"){
     listDiv.append(title)
     let cardDiv = document.createElement('div')
     cardDiv.className = "card-div"
-    fetch(`competitions/${type}`)
-    .then(response => response.json())
-    .then(results =>{
-        results.forEach(item => {
-            let card = document.createElement('div')
-            card.className="card"
-            card.innerHTML = 
-            `
-            <h3>${item.name}</h3>
-            <p><strong>Created by</strong>:${item.createdBy}</p>
-            <p><strong>Participients: </strong>${item.participients.length}</p>
-            <div class="center">
-            <a href="competition/${item.id}">View</a>
-            <div>
-            `
-            cardDiv.append(card)
-        });
-        listDiv.append(cardDiv)
-    })
+    if (type.toLowerCase()==='practice'){
+        fetch('practices/all')
+        .then(response => response.json())
+        .then(results =>{
+            console.log(results)
+            results.forEach(item => {
+                let card = document.createElement('div')
+                card.className="card"
+                card.innerHTML = 
+                `
+                <h3>Practice${item.id}</h3>
+                <p><strong>Scored:</strong>:${item.score}</p>
+                <p><strong>Total Questions:</strong>${item.noOfQuestion}</p>
+                <div class="center">
+                <a href="practice/${item.id}">View</a>
+                <div>
+                `
+                cardDiv.append(card)
+            });
+            listDiv.append(cardDiv)
+        })
+    } else {
+        fetch(`competitions/${type}`)
+        .then(response => response.json())
+        .then(results =>{
+            results.forEach(item => {
+                let card = document.createElement('div')
+                card.className="card"
+                card.innerHTML = 
+                `
+                <h3>${item.name}</h3>
+                <p><strong>Created by</strong>:${item.createdBy}</p>
+                <p><strong>Participients: </strong>${item.participients.length}</p>
+                <div class="center">
+                <a href="competition/${item.id}">View</a>
+                <div>
+                `
+                cardDiv.append(card)
+            });
+            listDiv.append(cardDiv)
+        })
+    }
 }
 function clockWork(){
     let clockMinute = document.querySelector("#clockminute");
