@@ -9,9 +9,12 @@
     <p><strong>Start Time: </strong>{{comp.startTime}}</p>
     <p><strong>Expires On: </strong>{{comp.endTime}}</p>
     <p><strong>Duration: </strong>{{comp.duration}}</p>
-    <p><strong>Total Participients: </strong>{{noOfAttendee}}</p>
     <p><strong>Total Questions: </strong>{{comp.noOfQuestion}}</p>
+    {% if comp.isChallenge %}
+    {% else %}
+    <p><strong>Total Participients: </strong>{{noOfAttendee}}</p>
     <p><strong>Description: </strong>{{comp.description}}</p>
+    {% endif %}
 </div>
 <div id="contest-meta">
     <div class="center">

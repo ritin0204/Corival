@@ -66,6 +66,7 @@ class Competition(models.Model):
     def serialize(self):
         return {
             'id':self.id,
+            'isChallenge': self.is_challenge,
             'name':self.name,
             'createdBy':self.createdBy.username,
             'startTime':self.start_time,

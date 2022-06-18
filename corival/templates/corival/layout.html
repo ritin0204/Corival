@@ -27,6 +27,7 @@
             {% elif request.user.is_superuser %}
                 <a id="createcontestlink" href="{% url 'add_contest' %}" style="background-color: aliceblue;color: black;">Create Contest</a>
             {% else %}
+                <a id="createcontestlink" href="{% url 'add_challenge' %}" style="background-color: aliceblue;color: black;">Create Challenge</a>
             {% endif %}
             <a href="{% url 'create-practice' %}" id="createcontestlink" style="background-color: aliceblue;color: black;">Let's Practice</a>
         </div>

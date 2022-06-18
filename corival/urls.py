@@ -20,7 +20,7 @@ urlpatterns = [
     #Path to start and submit competition quiz
     path('competition/start/<int:compId>',views.startContest,name='start-competition'),
     #create/challenge
-    # path('competition/create',views.add_contest,name='add_contest'),
+    path('challenge/create',views.add_challenge,name='add_challenge'),
     #Get Questions to practice(get request) , Submit answersand get score(by post request)
     path('practice/',views.add_practice,name='create-practice'),
 

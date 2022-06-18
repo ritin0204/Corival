@@ -1,5 +1,5 @@
 from django.http import JsonResponse
-import json,datetime,random
+import json,datetime
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
@@ -36,7 +36,7 @@ def competitions(request,type):
     now = timezone.now()
     contests = Competition.objects.all()
     if type == "all":
-        return JsonResponse([contest.serialize() for contest in contests],status =200,safe=False)
+        return JsonResponse([contest.serialize() for contest in contests.filter(is_challenge=False)],status =200,safe=False)
     elif type == "ongoing":
         #need to fix
         return JsonResponse([contest.serialize() for contest in contests if contest.end_time > now],status =200,safe=False)
@@ -51,10 +51,43 @@ def competitions(request,type):
     else:
         return render(request,"corival/error.html",{"error":f"Invalid Type Of Contest! Are You Sure It's {type}"})
 
-# @login_required
-# def add_challenge(request):
-    # pass
-#if you creating challenge send value is_challenge = true and valid opponent id
+@login_required
+@csrf_exempt
+def add_challenge(request):
+    if request.method == "POST":
+        getrival = request.POST["rival"]
+        try:
+            rival = User.objects.get(username=getrival)
+            if(rival == str(request.user.username)):
+                return render(request,"corival/createChallenge.html",{"error":"Be realistic!! You can't challenge yourself."})
+        except ObjectDoesNotExist:
+            return render(request,"corival/createChallenge.html",{"error":"Entered Username doesn't exists in our database."})
+        name = request.POST["name"]
+        createdBy = request.user
+        start = datetime.datetime.now()
+        end = start + datetime.timedelta(days=1)
+        no_of_questions = int(request.POST["noOfQuestions"])
+        minutes = no_of_questions*1.75
+        duration = datetime.timedelta(minutes=minutes)
+        try:
+            comp = Competition.objects.create(name=name,is_challenge=True,createdBy=createdBy,duration=duration,start_time=start,end_time=end,no_of_questions=no_of_questions)
+            comp.participients.add(rival)
+            #Sending notification to both challenger and challenge
+            rivalUpdate = Notifications.objects.create(message=f"{request.user} sent you challenge on Apptitude.",message_url=f"competition/{comp.id}",user=rival.id)
+            rivalUpdate.save()
+            userUpdate = Notifications.objects.create(message=f"You challenged {rival}!",message_url=f"competition/{comp.id}",user=request.user)
+            userUpdate.save()
+            questions = Questions.objects.all()[:no_of_questions]
+            for que in questions:
+                comp.questions.add(que)
+            comp.save()
+            return redirect('competition',comp.id)
+        except Exception as e:
+            print(e)
+            return render(request,"corival/error.html",{"error":f"{str(e)}"})
+    else:
+        return render(request,"corival/createChallenge.html")
+
 
 @login_required
 @csrf_exempt
@@ -125,24 +158,12 @@ def add_contest(request):
         end = request.POST["endTime"]
         description = request.POST["description"]
         no_of_questions = int(request.POST["noOfQuestions"])
-        
+        topics = request.POST.getlist('topics')
+        #A little fix here
         minutes = no_of_questions*1.75
         duration = datetime.timedelta(minutes=minutes)
         try:
             comp = Competition.objects.create(name=name,createdBy=createdBy,duration=duration,start_time=start,end_time=end,description=description,no_of_questions=no_of_questions)
-            # upperLimit = Questions.objects.latest('id')
-            #Edit to get random question for Contest
-            # i=0
-            # while(i<=no_of_questions):
-            #     num = random.randint(0,upperLimit)
-            #     try:
-            #         que = Questions.objects.get(id=num)
-            #     except Exception as e :
-            #         print(e)
-            #         continue
-            #     else:
-            #         comp.questions.add(que)
-            #         i+=1
             questions = Questions.objects.all()[:no_of_questions]
             for que in questions:
                 comp.questions.add(que)
