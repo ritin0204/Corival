@@ -1,23 +1,7 @@
 {% extends 'corival/layout.html' %}
 {% load static %}
-{% block title %} Home {% endblock %}
+{% block title %} Corival | Home {% endblock %}
 
 {% block body %}
-<div id="index" class="center">
-    <label for="contestType">SELECT HERE:</label> <br>
-    <select name="contest-type" id="contestType" onchange="loadIndexContent(this.value)">
-        <option value="0" hidden selected>Select Here</option>
-        <option value="all">All Competitions</option>
-        <option value="archived">Archived Competitions</option>
-        <option value="ongoing">Ongoing Competitions</option>
-        <option value="challenges">challenges (Comeing Soon)</option>
-        <option value="practice">Practices</option>
-    </select>
-</div>
-<section id="list-items" class="center">
-</section>
-
-    {% block script %}
-        <script src="{% static 'js/index.js' %}"></script>
-    {% endblock %}
+    
 {% endblock %}

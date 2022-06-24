@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+import datetime
 
 # Choices Feilds
 APPTITUDE_TYPES = [
@@ -8,27 +9,19 @@ APPTITUDE_TYPES = [
     ('DC','Discount'),
     ('SI','Simple Interest')
 ]
-
+ALERT_TYPES = [
+    ('CH','Challenge'),
+    ('COMP','Competition'),
+    ('USR','User'),
+    ('PRC','Practice')
+]
 
 # Create your models here.
 class User(AbstractUser):
     is_manager = models.BooleanField(default=False)
     rating = models.IntegerField(null=True)
     bio = models.TextField(null=True)
-
-    def serialize(self):
-        return {
-            'username':self.username,
-            'email': self.email,
-            'bio': self.bio,
-            'fullName': self.get_full_name(),
-            'isAdmin': self.is_superuser,
-            'isManager':self.is_manager,
-            'rating':self.rating,
-            'dateJoined':self.date_joined,
-            'lastLogin' : self.last_login
-        }
-
+    profile_pic = models.ImageField(blank=True,null=True,verbose_name="profilepic")
 
 class Questions(models.Model):
     statement = models.TextField(unique=True)
@@ -52,15 +45,14 @@ class Questions(models.Model):
 
 class Competition(models.Model):
     name = models.CharField(max_length=150,blank=False,unique=True)
-    is_challenge = models.BooleanField(default=False)
     createdBy = models.ForeignKey("User",on_delete=models.CASCADE)
-    start_time = models.DateTimeField(blank=False)
-    end_time = models.DateTimeField(blank=False)
+    start_time = models.DateTimeField(blank=False,default=datetime.datetime.now())
+    end_time = models.DateTimeField(blank=False,default=datetime.datetime.now() + datetime.timedelta(days=1))
     duration = models.DurationField(blank=False)
     archive = models.BooleanField(default=False)
     description = models.TextField(null=True)
-    participients = models.ManyToManyField("User",related_name='participient')
-    questions = models.ManyToManyField("Questions",related_name='questions')
+    participients = models.ManyToManyField("User",related_name='participients',blank=True)
+    questions = models.ManyToManyField("Questions",related_name='questions',blank=True)
     no_of_questions = models.IntegerField(default=20)
 
     def serialize(self):
@@ -79,6 +71,7 @@ class Competition(models.Model):
         }
 
 class Practice(models.Model):
+    title = models.TextField(max_length=100,null=True)
     user = models.ForeignKey("User",on_delete=models.CASCADE)
     duration = models.DurationField(blank=False)
     questions = models.ManyToManyField("Questions",related_name='practicequestions')
@@ -96,6 +89,7 @@ class Practice(models.Model):
 class CompResponse(models.Model):
     compId = models.ForeignKey("Competition",on_delete=models.CASCADE)
     userId = models.ForeignKey("User",on_delete=models.CASCADE)
+    start_time = models.DateTimeField(auto_now_add=True,null=True)
     score = models.IntegerField(blank=False)
 
     def serialize(self):
@@ -109,6 +103,7 @@ class Notifications(models.Model):
     message_url = models.TextField()
     read = models.BooleanField(default=False)
     user = models.ForeignKey("User",on_delete=models.CASCADE)
+    alerType = models.CharField(max_length=100,choices=ALERT_TYPES,null=True,default=None)
     created_time = models.DateTimeField(auto_now_add=True,editable=False)
 
     def serialize(self):
@@ -118,3 +113,22 @@ class Notifications(models.Model):
             "created_time":self.created_time,
             "read" : self.read
         }
+
+class Challenges(models.Model):
+    name = models.CharField(max_length=150,blank=False,unique=True)
+    createdBy = models.ForeignKey("User",on_delete=models.CASCADE,related_name="challenger")
+    start_time = models.DateTimeField(blank=False,default=datetime.datetime.now())
+    end_time = models.DateTimeField(blank=False,default=datetime.datetime.now() + datetime.timedelta(days=1))
+    duration = models.DurationField(blank=False)
+    opponent = models.ForeignKey("User",on_delete=models.CASCADE,related_name="chllengee")
+    questions = models.ManyToManyField("Questions",related_name='challenge_questions',blank=True)
+    user_score = models.IntegerField(blank=True,null=True)
+    opponent_score = models.IntegerField(blank=True,null=True)
+    no_of_questions = models.IntegerField(default=20)
+    finished = models.BooleanField(default=False)
+
+    def __init__(self, *args, **kwargs) -> None:
+        if self.end_time<=datetime.datetime.now():
+            self.delete()
+            return None
+        super().__init__(*args, **kwargs)

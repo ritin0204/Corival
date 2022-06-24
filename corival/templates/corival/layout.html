@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"> -->
+    <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <title>{% block title %} {% endblock %}</title>
 </head>
@@ -13,23 +13,6 @@
     <nav>
         <div id="logo">
             <img src="{% static 'img/corival-logos_transparent.png' %}" width="150px" alt="Corival">
-        </div>
-        <div id="nav-items">
-            <a href="{% url 'index' %}" id="index-link">Home</a>
-            <a href="{% url 'notifications' %}" id="bell-link">Updates</a>
-            {% if request.user.is_authenticated %}
-                <a href="{% url 'get_user' request.user.username %}">{{request.user.username}}</a>
-            {% else %}
-                <a href="{% url 'login-view' %}">Login</a>
-            {% endif %}
-            {% if request.user.is_manager %}
-                <a id="createcontestlink" href="{% url 'add_contest' %}" style="background-color: aliceblue;color: black;">Create Contest</a>
-            {% elif request.user.is_superuser %}
-                <a id="createcontestlink" href="{% url 'add_contest' %}" style="background-color: aliceblue;color: black;">Create Contest</a>
-            {% else %}
-                <a id="createcontestlink" href="{% url 'add_challenge' %}" style="background-color: aliceblue;color: black;">Create Challenge</a>
-            {% endif %}
-            <a href="{% url 'create-practice' %}" id="createcontestlink" style="background-color: aliceblue;color: black;">Let's Practice</a>
         </div>
     </nav>
     <div id="container">

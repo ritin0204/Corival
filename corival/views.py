@@ -1,5 +1,5 @@
-from django.http import JsonResponse
-import json,datetime
+from django.http import Http404, HttpResponse, JsonResponse
+import datetime
 from django.views.decorators.csrf import csrf_exempt
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
@@ -7,7 +7,11 @@ from django.db import IntegrityError
 from django.shortcuts import redirect, render
 from django.contrib.auth import login,logout,authenticate
 from django.contrib.auth.decorators import login_required
-from .models import Practice,User,Competition,CompResponse,Questions,Notifications
+from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from .serializers import ChallengeSerializer, CompResponseSerializer, CompetitionSerializer, NotificationsSerializer, PracticeSerializer, QuestionsSerializer, UserSerializer
+from .models import Challenges, Practice,User,Competition,CompResponse,Questions,Notifications
+from .helper import getScore,getQuestions, notifyUser
 
 # Create your views here.
 def index(request):
@@ -16,20 +20,35 @@ def index(request):
     return render(request,'corival/login.html')
 
 @login_required
+@csrf_exempt
+@api_view(['GET','POST','PUT','DELETE'])
 def get_user(request,username):
-    try:
-        user = User.objects.get(username=username)
-        return render(request,"corival/profile.html",{"user":user.serialize()})
-    except ObjectDoesNotExist:
-        return render(request,"corival/error.html",{"error":"404: Username Not Found"})
-
-@login_required
-def notifications(request):
-    alerts = Notifications.objects.filter(user=request.user.id)
-    alerts.order_by('-created_time')
-    return render(request,"corival/updates.html",{
-        "notifications":[alert.serialize() for alert in alerts]
-    })
+    if request.method == "POST" and username=="register":
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            userObj = User.objects.get(username = serializer.data['username'])
+            login(request,userObj)
+            return redirect('index')
+        return Response(serializer.errors, status=400)
+    elif request.method == 'PUT':
+        serializer = UserSerializer(request.user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
+    elif request.method == 'DELETE':
+        request.user.delete()
+        return redirect('logout-view')
+    else:
+        if username=="register":
+            return render(request,'corival/register.html')
+        try:
+            user = User.objects.get(username=username)
+            userData = UserSerializer(instance=user,many=False)
+            return Response(userData.data,status=201)
+        except ObjectDoesNotExist:
+            return render(request,"corival/error.html",{"error":f"404: There is No such username exists with name \"{username}\""})
 
 @login_required
 def competitions(request,type):
@@ -46,134 +65,244 @@ def competitions(request,type):
                 contest.archive=True
                 contest.save()
         return JsonResponse([contest.serialize() for contest in contests.filter(archive=True)],status=200,safe=False)
-    elif type=="challenges":
-        return JsonResponse([contest.serialize() for contest in contests.filter(is_challenge=True)],status =200,safe=False)
     else:
         return render(request,"corival/error.html",{"error":f"Invalid Type Of Contest! Are You Sure It's {type}"})
 
 @login_required
 @csrf_exempt
-def add_challenge(request):
-    if request.method == "POST":
-        getrival = request.POST["rival"]
+@api_view(['GET','POST','DELETE'])
+def get_competition(request,compId):
+    if compId != "create":
         try:
-            rival = User.objects.get(username=getrival)
-            if(rival == str(request.user.username)):
-                return render(request,"corival/createChallenge.html",{"error":"Be realistic!! You can't challenge yourself."})
+            compObj = Competition.objects.get(id=int(compId))
         except ObjectDoesNotExist:
-            return render(request,"corival/createChallenge.html",{"error":"Entered Username doesn't exists in our database."})
-        name = request.POST["name"]
-        createdBy = request.user
-        start = datetime.datetime.now()
-        end = start + datetime.timedelta(days=1)
-        no_of_questions = int(request.POST["noOfQuestions"])
-        minutes = no_of_questions*1.75
-        duration = datetime.timedelta(minutes=minutes)
-        try:
-            comp = Competition.objects.create(name=name,is_challenge=True,createdBy=createdBy,duration=duration,start_time=start,end_time=end,no_of_questions=no_of_questions)
-            comp.participients.add(rival)
-            #Sending notification to both challenger and challenge
-            rivalUpdate = Notifications.objects.create(message=f"{request.user} sent you challenge on Apptitude.",message_url=f"competition/{comp.id}",user=rival.id)
-            rivalUpdate.save()
-            userUpdate = Notifications.objects.create(message=f"You challenged {rival}!",message_url=f"competition/{comp.id}",user=request.user)
-            userUpdate.save()
-            questions = Questions.objects.all()[:no_of_questions]
-            for que in questions:
-                comp.questions.add(que)
-            comp.save()
-            return redirect('competition',comp.id)
-        except Exception as e:
-            print(e)
-            return render(request,"corival/error.html",{"error":f"{str(e)}"})
-    else:
-        return render(request,"corival/createChallenge.html")
+            return JsonResponse({"error":"id not found"})
+        except ValueError:
+            return HttpResponse("invalid Url")
 
+    if compId == "create" and request.method == "POST":
+        if request.user.is_superuser or request.user.is_manager:
+            no_of_questions = int(request.data["no_of_questions"])
+            categorylist = []
+            questionlist = getQuestions(no_of_questions,categorylist)
+            attr = {
+                "questions":questionlist,
+                "duration":datetime.timedelta(minutes=no_of_questions*1.75),
+                "createdBy":request.user.id,
+                "participients":[]
+            }
+            request.data.update(attr)
+            serializer = CompetitionSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data,status=200)
+            return Response(serializer.errors,status=400)
+        return Response({"Error":"You are forbidden to create competition"},status=403)
 
-@login_required
-@csrf_exempt
-def add_practice(request):
-    if request.method == "POST":
-        topics = request.POST.getlist('topics')
-        no_of_questions = int(request.POST["noOfQuestions"])
-        print(topics, no_of_questions)
-        minutes = no_of_questions*1.75
-        duration = datetime.timedelta(minutes=minutes)
-        practice = Practice.objects.create(user=request.user,duration=duration,no_of_questions=no_of_questions)
-        if topics == []:
-            questions = Questions.objects.all()[0:no_of_questions+1]
+    elif request.method == "DELETE" and compObj.createdBy == request.user.id:
+        compObj.delete()
+        return redirect('index')
+
+    elif request.method == "GET":
+        if compId == "create":
+            return HttpResponse("render competition create form here")
         else:
-            questions = Questions.objects.filter(category=str(topics[0]))
-            #add [0:no_of_questions]
-        for que in questions:
-            practice.questions.add(que)
-        practice.save()
-        return render(request,"corival/quiz.html",{
-            "comp":practice,
-            "totalQuestions":practice.no_of_questions,
-            "duration":practice.duration,
-            "questions":[question.serialize() for question in questions]
-        })
-    else:
-        return render(request,"corival/practice.html")
+            serializer = CompetitionSerializer(compObj,many=False)
+            return Response(serializer.data,status=200)
 
+    else:
+        return Response({"error":"Bad Request"},status=400)
+
+#Operations of compResponse table
 @login_required
 @csrf_exempt
-def result_practice(request,pracId):
+@api_view(["GET","POST"])
+def participate(request,compId):
     try:
-        practice = Practice.objects.get(id=pracId)
-    except:
-        return render(request,"corival/error.html",{
-            "error" : "No Such Session Found."
-        })
-    questions = practice.questions.all()
-    if request.method=="POST":
-        total = questions.count()
-        userPoint = 0
-        for que in questions:
-            userAns = str(request.POST[str(que.id)])
-            if str(que.right_answer)==userAns:
-                userPoint+=1
-        userScore = (userPoint//total)*100
-        practice.score = userScore
-        practice.save()
-        update = Notifications.objects.create(message="You Appeared in Practice Session",message_url=f"practice/{practice.id}",user=request.user)
-        update.save()
-    if practice.score is None:
-        return render(request,"corival/error.html",{
-            "error" : "You Haven't Submitted Any Response."
-        })
-    return render(request,"corival/practiceResult.html",{
-        "noOfQuestion":questions.count(),
-        "practice" : practice,
-        "questions" : [question.serialize() for question in questions]
-    })
+        compObj = Competition.objects.get(id=compId)
+    except ObjectDoesNotExist:
+        return Http404
+    if request.method == "POST":
+        if not compObj.archive:
+            serializer = CompResponseSerializer({"compId":compObj.id,"userId":request.user.id})
+            if serializer.is_valid():
+                serializer.save()
+                questions = compObj.questions.all()
+                return render(request,"corival/quiz.html",{
+                    "Obj" : compObj,
+                    "questions":[question.serialize() for question in questions]
+                })
+            return Response(serializer.errors,status=400)
+        return Response({"Error":"This Competition is Ended or your given time to complete assesmet is passed"},status=403)
+    elif request.method == "GET":
+        resObj = CompResponse.objects.get(compId=compId,userId=request.user.id)
+        serializer = CompResponseSerializer(resObj,many=False)
+        return Response(serializer.data,status=200)
+    else:
+        return Response({"Error":"Forbidden Method"},status=403)
 
 @login_required
 @csrf_exempt
-def add_contest(request):
-    if request.method == "POST":
-        name = request.POST["name"]
-        createdBy = request.user
-        start = request.POST["startTime"]
-        end = request.POST["endTime"]
-        description = request.POST["description"]
-        no_of_questions = int(request.POST["noOfQuestions"])
-        topics = request.POST.getlist('topics')
-        #A little fix here
-        minutes = no_of_questions*1.75
-        duration = datetime.timedelta(minutes=minutes)
+@api_view(["PUT"])
+def submit_contest(request,compId):
+    try:
+        compObj = Competition.objects.get(id=compId)
+        resObj = CompResponse.objects.get(compId=compId,userId=request.user.id)
+    except ObjectDoesNotExist:
+        return Http404
+    if request.method == "PUT":
+        if not compObj.archive and datetime.datetime.now() <= compObj.start_time + compObj.duration+datetime.timedelta(minutes=5):
+            compObj.participients.add(request.user.id)
+            compObj.save()
+            resObj.score = getScore(compId,request,"contest")
+            resObj.save()
+            return redirect('getCompetition',compObj.id)
+        return Response({"Error":"This Competition is Ended or your given time to complete assesmet is passed"},status=403)
+    return Response({"Error":"Forbidden Method"},status=403)
+
+@login_required
+@csrf_exempt
+@api_view(["GET","POST","PUT","DELETE"])
+def do_practice(request,pracId):
+    if pracId != "create":
         try:
-            comp = Competition.objects.create(name=name,createdBy=createdBy,duration=duration,start_time=start,end_time=end,description=description,no_of_questions=no_of_questions)
-            questions = Questions.objects.all()[:no_of_questions]
-            for que in questions:
-                comp.questions.add(que)
-            comp.save()
-            return redirect('competition',comp.id)
-        except Exception as e:
-            print(e)
-            return render(request,"corival/error.html",{"error":f"{str(e)}"})
+            pracObj = Practice.objects.get(id=int(pracId))
+        except ObjectDoesNotExist:
+            return render(request,"corival/error.html",{"error":f"404: There is No such practice exists with name \"{pracId}\""})
+        except ValueError:
+            return Http404
     else:
-        return render(request,"corival/createComp.html")
+        return render(request,'corival/createPractice.html')
+    if request.method == "POST" and pracId=="create":
+        no_of_questions = request.data["no_of_questions"]
+        attr = {
+            "questions":getQuestions(no_of_questions,request.data["category"]),
+            "user":request.user.id,
+            "duration":datetime.timedelta(minutes=no_of_questions*1.75),
+        }
+        request.data.update(attr)
+        serializer = PracticeSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return redirect('do-practice',serializer.data["id"])
+        return Response(serializer.errors, status=400)
+    elif request.method == 'PUT':
+        attr = {
+            "id":pracId,
+            "score":getScore(pracId,request,"practice")
+        }
+        request.data.update(attr)
+        serializer = PracticeSerializer(pracObj, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data["score"],status=200)
+        return Response(serializer.errors, status=400)
+    elif request.method == 'DELETE' and pracObj.user == request.user.id:
+        pracObj.delete()
+        return redirect('index')
+    else:
+        pracData = PracticeSerializer(instance=pracObj,many=False)
+        return Response(pracData.data,status=201)
+
+@login_required
+@csrf_exempt
+@api_view(["GET"])
+def start_practice(request,pracId):
+    try:
+        pracObj = Practice.objects.get(id = pracId)
+    except ObjectDoesNotExist:
+        return Response({"Error":"Invalid Id"},status=404)
+    if request.user.id == pracObj.user and pracObj.score==None:
+        serializer = PracticeSerializer(pracObj,many=False)
+        questions = pracObj.questions.all()
+        return render(request,"corival/quiz.html",{
+            "Obj" : pracObj,
+            "questions":[question.serialize() for question in questions],
+            "is_practice":True
+        })
+        # return Response(serializer.data,status=200)
+    else:
+        return Response({"Error":"Bad request"},status=400)
+
+@login_required
+@csrf_exempt
+@api_view(["POST"])
+def create_challenge(request):
+    if request.method == "POST":
+        no_of_questions = int(request.data["no_of_questions"])
+        categorylist = []
+        questionlist = getQuestions(no_of_questions,categorylist)
+        attr = {
+            "questions":questionlist,
+            "duration":datetime.timedelta(minutes=no_of_questions*1.75),
+            "createdBy":request.user.id
+        }
+        request.data.update(attr)
+        serializer = ChallengeSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=200)
+        return Response(serializer.errors,status=400)
+    return Response({"Success":"display challenge create form"},status=200)
+
+@login_required
+@csrf_exempt
+@api_view(["GET","PUT","DELETE"])
+def get_challenge(request,challId):
+    try:
+        challObj = Challenges.objects.get(id=challId)
+    except ObjectDoesNotExist:
+        return Response({"Error":"Not Found"},status=400)
+    if request.method == "GET" and challObj.finished:
+        serializer = ChallengeSerializer(challObj,many=False)
+        return Response(serializer.data,status=200)
+
+    elif request.method == "PUT":
+        result = getScore(challId,request,"challenge")
+        if request.user.id == challObj.createdBy:
+            challObj.user_score = result
+        elif request.user.id == challObj.opponent:
+            challObj.opponent_score = result
+            challObj.finished = True
+        else:
+            return HttpResponse("You can't respond to someone elses challenge")
+        challObj.save()
+        return HttpResponse("Thank you Page")
+
+    elif request.method == "DELETE" and request.user.id == challObj.user or request.user.id == challObj.opponent:
+        challObj.delete()
+        return Response({"success":"Decline the challenge"},status=200)
+    
+    else:
+        return HttpResponse("bad request or Challenge haven't finished yet")
+
+@login_required
+@api_view(["GET"])
+def all_challenge(request):
+    if request.method == "GET":
+        challenges = Challenges.objects.filter(finished=False).filter(opponent=request.user)
+        serializer = ChallengeSerializer(challenges,many=True)
+        return Response(serializer.data,status=200)
+    return Response(serializer.data,status=400)
+
+@login_required
+@api_view(["GET"])
+def search_user(request,username):
+    user = User.objects.filter(username__startswith=username)
+    userData = UserSerializer(instance=user,many=True)
+    return Response(userData.data,status=201)
+
+@login_required
+@api_view(['GET'])
+def get_scores(request,compId):
+    scores = CompResponseSerializer(CompResponse.objects.filter(compId=compId),many=True)
+    return Response(scores.data,status=201)
+
+@login_required
+@api_view(['GET'])
+def notifications(request):
+    updates = NotificationsSerializer(Notifications.objects.filter(user=request.user.id),many=True)
+    return Response(updates.data,status=201)
 
 @login_required
 @csrf_exempt
@@ -181,81 +310,7 @@ def all_Practices(request):
     practices = Practice.objects.filter(user=request.user.id)
     return JsonResponse([practice.serialize() for practice in practices],safe=False)
 
-@login_required
-def get_competition(request,compId):
-    try:
-        comp = Competition.objects.get(id=compId)
-        attendees = CompResponse.objects.filter(compId=compId).exclude(userId=request.user.id)
-        noOfAttendee = comp.participients.all().count()
-        attendees = [attendee.serialize() for attendee in attendees]
-        currentUser = CompResponse.objects.filter(compId=compId).filter(userId=request.user.id)
-        if currentUser.count() == 0:
-            return render(request,"corival/contest.html",{
-                "comp":comp.serialize(),
-                "noOfAttendee": noOfAttendee,
-                "attendees":attendees
-                })
-        else:
-            return render(request,"corival/contest.html",{
-                "comp":comp.serialize(),
-                "noOfAttendee": noOfAttendee,
-                "attendees":attendees,
-                "your":currentUser[0]
-                })
-    except ObjectDoesNotExist:
-        return render(request,"corival/error.html",{"error":"404! Competition Not Found"})
-
-@login_required
 @csrf_exempt
-def startContest(request,compId):
-    try:
-        comp = Competition.objects.get(id=compId)
-    except ObjectDoesNotExist:
-        return render(request,"corival/error.html",{"error":"404, competition Not Found"})
-    else:
-        questions = comp.questions.all()
-        participient = request.user
-        if request.method == "POST":
-            givenExam = False
-            attendees = comp.participients.all()
-            for att in attendees:
-                if str(att.username)==str(participient.username):
-                    givenExam=True
-            if givenExam:
-                return render(request,"corival/error.html",{"error":"You Participated before on the Test!"})
-            comp.participients.add(participient.id)
-            comp.save()
-            total = questions.count()
-            userPoint = 0
-            for que in questions:
-                userAns = str(request.POST[str(que.id)])
-                if str(que.right_answer)==userAns:
-                    userPoint+=1
-            userScore = (userPoint//total)*100
-            try:
-                response = CompResponse.objects.create(compId=comp,userId=participient,score=userScore)
-                response.save()
-            except IntegrityError:
-                return render(request,"corival/error.html",{"error":"We Have Your Response Already! You don't have to worry."})
-            update = Notifications.objects.create(message="You Participated in Contest!",message_url=f"competition/{comp.id}",user=participient)
-            update.save()
-            return redirect('competition',comp.id)
-        else:
-            givenExam = False
-            attendees = comp.participients.all()
-            for att in attendees:
-                if str(att.username)==str(participient.username):
-                    givenExam=True
-            if not givenExam:
-                return render(request,"corival/quiz.html",{
-                    "comp" : comp,
-                    "totalQuestions":comp.no_of_questions,
-                    "duration":comp.duration,
-                    "questions":[question.serialize() for question in questions]
-                })
-            else:
-                return render(request,"corival/error.html",{"error":"You Already given the Test!"})
-
 def login_view(request):
     if request.method =="POST":
         username = request.POST['username']
@@ -270,6 +325,7 @@ def login_view(request):
             })
     return render(request,'corival/login.html')
 
+@csrf_exempt
 def register_view(request):
     if request.method == "POST":
         username = request.POST['username']
@@ -309,16 +365,14 @@ def logout_view(request):
     return redirect('index')
 
 @csrf_exempt
+@api_view(['GET','POST'])
 def add_questions(request):
     if request.method=="POST":
-        data = json.loads(request.body)
-        question = data.get("statement","")
-        op1 = data["op1"]
-        op2 = data["op2"]
-        op3 = data["op3"]
-        op4 = data["op4"]
-        rightans = data["right"]
-        queType = data["queType"]
-        que = Questions.objects.create(statement=question,options1=op1,options2=op2,options3=op3,options4=op4,right_answer=rightans,category=queType)
-        return JsonResponse(que.serialize(),status=201)
-    return JsonResponse({"Error":"POST Method Required"})
+        serializer = QuestionsSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+    elif request.method == "GET":
+        return Response(QuestionsSerializer(Questions.objects.all(),many=True).data)
+    else:
+        return render(request,"corival/error.html",{"error":"400 : Invalid request"})

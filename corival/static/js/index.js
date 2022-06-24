@@ -96,17 +96,20 @@ function displayContestForm()
 }
 // // Add questions Using javaScript
 // const question = {
-//     'statement':"How Are you?",
-//     'op1':"rp",
-//     'op2':"we",
-//     'op3':"yu",
-//     "op4" : "gh",
-//     "right":"yu",
-//     "queType":'PR'
-// }
+//     "id":30,
+//         "statement": "A sum of Rs.1600 gives a simple interest of Rs.252 in 3 years and 4 months.  The rate of interest per annum is :",
+//         "options1": "6%",
+//         "options2": "6 1/4 %",
+//         "options3": "6 1/2%",
+//         "options4": "6 3/4 %",
+//         "category": "SI",
+//         "right_answer": "6 1/2%"
+//     }
 // const options = {
 //     method:"POST",
-//     body:JSON.stringify(question)
+//     body:JSON.stringify(question),headers: {
+//       'Content-type': 'application/json','X-CSRFToken': csrftoken
+//     }
 // }
 // fetch('/question/add',options)
 //     .then(response=>response.json())
