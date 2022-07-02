@@ -9,7 +9,7 @@ urlpatterns = [
     # Notifications
     path('notifications',views.notifications,name='notifications'),
     #All kinds of Contest
-    path('competitions/<str:type>',views.competitions,name='contest_type'),
+    path('competitions/<str:type>',views.competitions,name='contest-type'),
     #all practices
     path('practices/all',views.all_Practices,name='all-practices'),
     #Competitions Create,Read, update, Delete

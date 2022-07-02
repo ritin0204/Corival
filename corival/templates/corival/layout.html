@@ -6,24 +6,69 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}" type="image/x-icon">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/main.css' %}">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat&family=Cinzel+Decorative&family=Open+Sans:wght@300&display=swap" rel="stylesheet">
     <title>{% block title %} {% endblock %}</title>
 </head>
 <body>
-    <nav>
-        <div id="logo">
-            <img src="{% static 'img/corival-logos_transparent.png' %}" width="150px" alt="Corival">
+    <nav class="side-nav shadow">
+        <div class="nav-content flex">
+            {% if request.user.is_authenticated %}
+            <div class="user-profile flex">
+                <div><img id="profile-pic" class="profile-img shadow hover" src="{{ userImage }}"></div>
+                <a href="{% url 'logout-view' %}" class="btn hover black-bg">Logout</a>
+                <input id="userId" type="text" value="{{ request.user.username }}" hidden>
+            </div>
+            <ul class="flex" id="nav-items">
+                <li class="nav-item"><a href="{% url 'contest-type' 'all' %}">Competitions</a></li>
+                <li class="nav-item"><a href="{% url 'all-challenge' %}">Challenges</a></li>
+                <li class="nav-item"><a href="{% url 'all-practices' %}">Practice</a></li>
+                <li class="nav-item"><a href="{% url 'notifications' %}">Notifications</a></li>
+                <li class="nav-item"><a href="#">About Us</a></li>
+            </ul>
+            {% else %}
+            <div class="guest-btn flex">
+                <a href="{% url 'login-view' %}" class="blue-btn btn hover">SignIn</a><h2><strong>Or</strong></h2>
+                <a href="{% url 'register-view' %}" class="blue-btn btn hover">SignUp</a>
+            </div>
+            {% endif %}
         </div>
     </nav>
-    <div id="container">
+    <!-- csrf token -->
+    <header class="shadow">
+        <div class="menu-bar shadow">
+            <div class="ham-one"></div>
+            <div class="ham-two"></div>
+        </div>
+        <a href="{% url 'index' %}">Corival</a>
+    </header>
+
+    <section id="main">
+        <div class="hero-div">
+            <div class="hero-detail">
+                <h1>Become <span class="black-bg">Better...</span></h1>
+                <p>7300+ Question avalible for <strong>FREE.</strong> Practice as much you want and get an analysis.</p>
+            </div>
+        </div>
+        <!-- User Profile page -->
+        <div id="profile-block">
+        </div>
         {% block body %}
         {% endblock %}
-    </div>
-    <script src="{% static 'js/index.js' %}"></script>
-    {% block script %}
-    {% endblock %}
-    <footer class="center">
+    </section>
+
+    <footer>
         <p>Welcome! My name is Footer. I contain some addition information and links related to website.</p>
+        <p>Social Links</p>
+        <ul class="social-link">
+            <li>Instagram</li>
+            <li>Facebook</li>
+            <li>Blogger</li>
+        </ul>
     </footer>
+    <script type="module" src="{% static 'js/main.js' %}"></script>
+    {% block script %}{% endblock %}
 </body>
 </html>

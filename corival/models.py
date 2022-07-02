@@ -21,7 +21,7 @@ class User(AbstractUser):
     is_manager = models.BooleanField(default=False)
     rating = models.IntegerField(null=True)
     bio = models.TextField(null=True)
-    profile_pic = models.ImageField(blank=True,null=True,verbose_name="profilepic")
+    profile_pic = models.ImageField(blank=True,null=True,verbose_name="profilepic",upload_to='corival/files/profile')
 
 class Questions(models.Model):
     statement = models.TextField(unique=True)
@@ -58,7 +58,6 @@ class Competition(models.Model):
     def serialize(self):
         return {
             'id':self.id,
-            'isChallenge': self.is_challenge,
             'name':self.name,
             'createdBy':self.createdBy.username,
             'startTime':self.start_time,

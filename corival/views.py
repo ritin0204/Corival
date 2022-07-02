@@ -16,8 +16,8 @@ from .helper import getScore,getQuestions, notifyUser
 # Create your views here.
 def index(request):
     if request.user.is_authenticated:
-        return render(request,'corival/index.html',{"username":request.user.username})
-    return render(request,'corival/login.html')
+        return render(request,'corival/index.html',{"userImage":request.user.profile_pic})
+    return render(request,'corival/index.html')
 
 @login_required
 @csrf_exempt
@@ -46,18 +46,19 @@ def get_user(request,username):
         try:
             user = User.objects.get(username=username)
             userData = UserSerializer(instance=user,many=False)
-            return Response(userData.data,status=201)
+            return JsonResponse(userData.data,status=201)
         except ObjectDoesNotExist:
             return render(request,"corival/error.html",{"error":f"404: There is No such username exists with name \"{username}\""})
 
+@api_view(['GET'])
 @login_required
 def competitions(request,type):
     now = timezone.now()
     contests = Competition.objects.all()
     if type == "all":
-        return JsonResponse([contest.serialize() for contest in contests.filter(is_challenge=False)],status =200,safe=False)
+        serializer = CompetitionSerializer(contests,many=True)
+        return JsonResponse(serializer.data,status=200,safe=False)
     elif type == "ongoing":
-        #need to fix
         return JsonResponse([contest.serialize() for contest in contests if contest.end_time > now],status =200,safe=False)
     elif type == "archived":
         for contest in contests:
@@ -66,7 +67,7 @@ def competitions(request,type):
                 contest.save()
         return JsonResponse([contest.serialize() for contest in contests.filter(archive=True)],status=200,safe=False)
     else:
-        return render(request,"corival/error.html",{"error":f"Invalid Type Of Contest! Are You Sure It's {type}"})
+        raise Http404("No such type Exists")
 
 @login_required
 @csrf_exempt
@@ -121,7 +122,7 @@ def participate(request,compId):
     try:
         compObj = Competition.objects.get(id=compId)
     except ObjectDoesNotExist:
-        return Http404
+        raise Http404("No object found")
     if request.method == "POST":
         if not compObj.archive:
             serializer = CompResponseSerializer({"compId":compObj.id,"userId":request.user.id})
