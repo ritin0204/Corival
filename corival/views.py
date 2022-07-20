@@ -281,10 +281,10 @@ def get_challenge(request,challId):
 @api_view(["GET"])
 def all_challenge(request):
     if request.method == "GET":
-        challenges = Challenges.objects.filter(finished=False).filter(opponent=request.user)
+        challenges = Challenges.objects.filter(opponent=request.user)
         serializer = ChallengeSerializer(challenges,many=True)
-        return Response(serializer.data,status=200)
-    return Response(serializer.data,status=400)
+        return JsonResponse(serializer.data,status=200,safe=False)
+    return Response(serializer.errors,status=400)
 
 @login_required
 @api_view(["GET"])

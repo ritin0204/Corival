@@ -127,7 +127,7 @@ class Challenges(models.Model):
     finished = models.BooleanField(default=False)
 
     def __init__(self, *args, **kwargs) -> None:
-        if self.end_time<=datetime.datetime.now():
+        super().__init__(*args, **kwargs)
+        if self.end_time.replace(tzinfo=None)<=datetime.datetime.now().replace(tzinfo=None) and not self.finished:
             self.delete()
             return None
-        super().__init__(*args, **kwargs)

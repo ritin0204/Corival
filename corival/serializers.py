@@ -1,5 +1,5 @@
 from attr import fields
-from .models import CompResponse, Competition, Notifications, Practice, Questions, User
+from .models import Challenges, CompResponse, Competition, Notifications, Practice, Questions, User
 from rest_framework import serializers
 
 class UserSerializer(serializers.ModelSerializer):
@@ -55,6 +55,6 @@ class NotificationsSerializer(serializers.ModelSerializer):
 
 class ChallengeSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Notifications
+        model = Challenges
         ordering = ['-end_time']
         fields = '__all__'
