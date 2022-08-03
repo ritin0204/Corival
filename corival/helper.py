@@ -30,3 +30,13 @@ def getQuestions(no_of_questions,categorylist=[]):
 
 def notifyUser():
     pass
+
+def formToJson(formdata):
+    ans = {}
+    form_data = dict(formdata)
+    dictData = formdata.dict()
+    for i in dictData:
+        ans[i] = dictData[i]
+    ans['topics'] = form_data["topics"] if form_data.get("topics") else []   
+    print(ans)
+    return ans

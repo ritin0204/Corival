@@ -19,8 +19,8 @@ ALERT_TYPES = [
 # Create your models here.
 class User(AbstractUser):
     is_manager = models.BooleanField(default=False)
-    rating = models.IntegerField(null=True)
-    bio = models.TextField(null=True)
+    rating = models.IntegerField(null=True,default=1500)
+    bio = models.TextField(null=True,default="Hello there! Just started Competiting.")
     profile_pic = models.ImageField(blank=True,null=True,verbose_name="profilepic",upload_to='corival/files/profile')
 
 class Questions(models.Model):
@@ -89,7 +89,7 @@ class CompResponse(models.Model):
     compId = models.ForeignKey("Competition",on_delete=models.CASCADE)
     userId = models.ForeignKey("User",on_delete=models.CASCADE)
     start_time = models.DateTimeField(auto_now_add=True,null=True)
-    score = models.IntegerField(blank=False)
+    score = models.IntegerField(null=True)
 
     def serialize(self):
         return {

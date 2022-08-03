@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from .serializers import ChallengeSerializer, CompResponseSerializer, CompetitionSerializer, NotificationsSerializer, PracticeSerializer, QuestionsSerializer, UserSerializer
 from .models import Challenges, Practice,User,Competition,CompResponse,Questions,Notifications
-from .helper import getScore,getQuestions, notifyUser
+from .helper import getScore,getQuestions, notifyUser,formToJson
 
 # Create your views here.
 def index(request):
@@ -23,6 +23,7 @@ def index(request):
 @csrf_exempt
 @api_view(['GET','POST','PUT','DELETE'])
 def get_user(request,username):
+    #if method is post and url is register that means user wants to register hinmself
     if request.method == "POST" and username=="register":
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
@@ -31,15 +32,21 @@ def get_user(request,username):
             login(request,userObj)
             return redirect('index')
         return Response(serializer.errors, status=400)
+
+    #if method is put that means user wants to update his information
     elif request.method == 'PUT':
         serializer = UserSerializer(request.user, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=400)
+
+    #if user wants to delete his account(Need Some Work..)
     elif request.method == 'DELETE':
         request.user.delete()
-        return redirect('logout-view')
+        return redirect("index")
+    
+    #Get user data in normal get request
     else:
         if username=="register":
             return render(request,'corival/register.html')
@@ -73,6 +80,7 @@ def competitions(request,type):
 @csrf_exempt
 @api_view(['GET','POST','DELETE'])
 def get_competition(request,compId):
+    #if the url is not valid that if will handle it.
     if compId != "create":
         try:
             compObj = Competition.objects.get(id=int(compId))
@@ -81,10 +89,13 @@ def get_competition(request,compId):
         except ValueError:
             return HttpResponse("invalid Url")
 
+    #if request url is create and method is post then create Competition.
     if compId == "create" and request.method == "POST":
+        print(request.POST['topics'])
         if request.user.is_superuser or request.user.is_manager:
-            no_of_questions = int(request.data["no_of_questions"])
-            categorylist = []
+            compData = formToJson(request.POST)
+            no_of_questions = int(compData["no_of_questions"])
+            categorylist = compData['topics']
             questionlist = getQuestions(no_of_questions,categorylist)
             attr = {
                 "questions":questionlist,
@@ -92,18 +103,20 @@ def get_competition(request,compId):
                 "createdBy":request.user.id,
                 "participients":[]
             }
-            request.data.update(attr)
-            serializer = CompetitionSerializer(data=request.data)
+            compData.update(attr)
+            serializer = CompetitionSerializer(data=compData)
             if serializer.is_valid():
                 serializer.save()
                 return Response(serializer.data,status=200)
             return Response(serializer.errors,status=400)
         return Response({"Error":"You are forbidden to create competition"},status=403)
 
-    elif request.method == "DELETE" and compObj.createdBy == request.user.id:
+    #if use is one who created the contest then he only can delete it.
+    elif request.method == "DELETE" and compObj.createdBy.username == request.user.username:
         compObj.delete()
         return redirect('index')
 
+    #if method is get and ur is create then render user form (not useful yet...)
     elif request.method == "GET":
         if compId == "create":
             return HttpResponse("render competition create form here")
@@ -111,10 +124,12 @@ def get_competition(request,compId):
             serializer = CompetitionSerializer(compObj,many=False)
             return Response(serializer.data,status=200)
 
+    #if None of them matched that means it's bad request.
     else:
         return Response({"error":"Bad Request"},status=400)
 
-#Operations of compResponse table
+#Operations of compResponse table that means,
+#A function to handle contest
 @login_required
 @csrf_exempt
 @api_view(["GET","POST"])
@@ -123,9 +138,11 @@ def participate(request,compId):
         compObj = Competition.objects.get(id=compId)
     except ObjectDoesNotExist:
         raise Http404("No object found")
+
+    #if method is post then user want to start contest.
     if request.method == "POST":
         if not compObj.archive:
-            serializer = CompResponseSerializer({"compId":compObj.id,"userId":request.user.id})
+            serializer = CompResponseSerializer(data={"compId":compObj.id,"userId":request.user.id})
             if serializer.is_valid():
                 serializer.save()
                 questions = compObj.questions.all()
@@ -135,13 +152,17 @@ def participate(request,compId):
                 })
             return Response(serializer.errors,status=400)
         return Response({"Error":"This Competition is Ended or your given time to complete assesmet is passed"},status=403)
+    
+    #if method is get then user wants his score after the competition
     elif request.method == "GET":
         resObj = CompResponse.objects.get(compId=compId,userId=request.user.id)
         serializer = CompResponseSerializer(resObj,many=False)
         return Response(serializer.data,status=200)
+    
     else:
         return Response({"Error":"Forbidden Method"},status=403)
 
+#bmit context function
 @login_required
 @csrf_exempt
 @api_view(["PUT"])
@@ -151,6 +172,8 @@ def submit_contest(request,compId):
         resObj = CompResponse.objects.get(compId=compId,userId=request.user.id)
     except ObjectDoesNotExist:
         return Http404
+    if resObj.score is not None:
+        return Response({"Error":"You cannot respond twice!"},status=403)
     if request.method == "PUT":
         if not compObj.archive and datetime.datetime.now() <= compObj.start_time + compObj.duration+datetime.timedelta(minutes=5):
             compObj.participients.add(request.user.id)
@@ -172,17 +195,19 @@ def do_practice(request,pracId):
             return render(request,"corival/error.html",{"error":f"404: There is No such practice exists with name \"{pracId}\""})
         except ValueError:
             return Http404
-    else:
-        return render(request,'corival/createPractice.html')
+    #if method is create and 
     if request.method == "POST" and pracId=="create":
-        no_of_questions = request.data["no_of_questions"]
+        form_data = dict(request.data)
+        no_of_questions = int(form_data["noOfQuestions"][0])
+        category = form_data["topics"] if form_data.get("topics") else []
+        print(category)
         attr = {
-            "questions":getQuestions(no_of_questions,request.data["category"]),
+            "no_of_questions":no_of_questions,
+            "questions":getQuestions(no_of_questions,category),
             "user":request.user.id,
             "duration":datetime.timedelta(minutes=no_of_questions*1.75),
         }
-        request.data.update(attr)
-        serializer = PracticeSerializer(data=request.data)
+        serializer = PracticeSerializer(data=attr)
         if serializer.is_valid():
             serializer.save()
             return redirect('do-practice',serializer.data["id"])

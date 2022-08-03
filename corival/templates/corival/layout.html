@@ -30,16 +30,17 @@
                 <input id="userId" type="text" value="{{ request.user.username }}" hidden>
             </div>
             <ul class="flex" id="nav-items">
+                <li class="nav-item"><button class="btn nav-btn" id="home-link">Home</a></li>
                 <li class="nav-item"><button class="btn nav-btn" id="comps-link" href="/competitions/all">Competitions</button></li>
                 <li class="nav-item"><button class="btn nav-btn" id="challenge-link" href="/challenges/all">Challenges</button></li>
                 <li class="nav-item"><button class="btn nav-btn" id="practice-link" href="/practices/all">Practice</button></li>
-                <li class="nav-item"><button class="btn nav-btn" href="{% url 'notifications' %}">Notifications</a></li>
+                <!-- <li class="nav-item"><button class="btn nav-btn" href="{% url 'notifications' %}">Notifications</a></li> -->
                 <li class="nav-item"><button class="btn nav-btn" href="#">About Us</a></li>
             </ul>
             {% else %}
             <div class="guest-btn flex">
-                <a href="{% url 'login-view' %}" class="pink-btn btn hover">SignIn</a><h2><strong>Or</strong></h2>
-                <a href="{% url 'register-view' %}" class="pink-btn btn hover">SignUp</a>
+                <a href="{% url 'login-view' %}" class="nav-item btn hover shadow">SignIn</a><h2><strong>Or</strong></h2>
+                <a href="{% url 'register-view' %}" class="nav-item btn hover shadow">SignUp</a>
             </div>
             {% endif %}
         </div>
@@ -47,33 +48,8 @@
     <!-- csrf token -->
 
     <section id="main">
-        <div class="hero-div">
-            <div class="hero-detail">
-                <h1>Become Better...</h1>
-                <p>7300+ Question avalible for <strong>FREE.</strong> Practice as much you want and get an analysis.</p>
-            </div>
-        </div>
-        <!-- User Profile page -->
-        <div id="profile-block">
-        </div>
-
-        <!-- Competitions block -->
-        <div id="comp-block">
-            <div class="competitions">
-                <h1>Competitions</h1>
-                <h2>Ongoing Contests</h2>
-                <div class="card-div" id="ongoing-div">
-                </div>
-                <h2>Archived Contests</h2>
-                <div class="card-div" id="archived-div">
-                </div>
-            </div>
-        </div>
-
-        <!-- Challenege Block -->
-
-        <div id="challenge-block">
-        </div>
+        {% block body %}
+        {% endblock %}
     </section>
 
     <footer>

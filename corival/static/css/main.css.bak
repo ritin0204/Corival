@@ -29,15 +29,11 @@ body {
     align-items: center;
     flex-direction: row;
 }
-.flex-column{
-    flex-direction: column;
-}
 .btn {
     border-radius: 4px;
     padding: 8px 15px;
     font-weight: 800;
     color: #fff;
-    background-color: var(--nav-btn-color);
     border: none;
     cursor: pointer;
 }
@@ -87,7 +83,7 @@ body {
     margin: 10px;
 }
 .btn-danger{
-    background-color: #e31717 ;
+    background-color: #e41111 ;
     border-radius: 16px;
     padding: 8px 25px;
     margin: 10px;
@@ -98,6 +94,19 @@ body {
     padding: 8px 25px;
     margin: 10px;
 }
+.btn-create {
+    border: 0.2px solid white;
+    padding: 20px 25px;
+    background-color: var(--nav-btn-color);
+    font-size: 1em;
+}
+.btn-create:hover{
+    background-color: #ff441b;
+}
+.btn-create:active{
+    border:4px solid var(--nav-btn-color);
+}
+
 /* All Navigation related Css will be Right Here */
 
 
@@ -105,7 +114,7 @@ body {
     background-color: var(--nav-btn-color);
     border-radius: 0px;
     color: white;
-    padding: 10px 15px;
+    padding: 10px 20px;
     border: none;
     border-radius: 20px;
     transition: all 150ms ease-in 50ms;
@@ -141,9 +150,9 @@ body {
     font-weight: 700;
 }
 .nav-btn{
-    padding: 10px 15px;
+    padding: 10px 20px;
     background-color: rgba(0, 0, 0, 0);
-    font-size: 0.9em;
+    font-size: 1em;
     color: rgb(0, 0, 0);
     letter-spacing: 1px;
 }
@@ -225,7 +234,7 @@ header > a {
 #profile-block{
     width:inherit;
     max-width: 1225px;
-    height:fit-content;
+    height:100vh;
     margin: auto;
     text-align: center;
     padding: 20px;
@@ -261,20 +270,20 @@ header > a {
 /* Competition Page css */
 
 
-#comp-block, #challenge-block,#practice-block{
+#comp-block, #challenge-block{
     max-width: 1125px;
     margin: auto;
 }
-#comp-block h1, #challenge-block h1,#practice-block h1{
+#comp-block h1, #challenge-block h1{
     text-align: center;
     font-size: xx-large;
     font-family: 'Dancing Script', cursive;
     font-size: 3em;
     color: #F23005;
 }
-#comp-block h2, #challenge-block h2,#practice-block h2{
+#comp-block h2, #challenge-block h2{
     text-align: center;
-    margin: 30px auto;
+    margin: 50px auto;
     color: #000000;
 }
 .card-div{
@@ -287,12 +296,12 @@ header > a {
 .card{
     max-width: 290px;
     max-height: min-content;
-    border: 0.1px solid rgba(0, 132, 255, 0.593);
+    border: 0.1px solid rgba(66, 66, 66,0.5);
     background-color: #d8d9d75c;
     flex-grow: 1;
     flex-shrink: 1;
     flex-wrap: wrap;
-    margin: 30px;
+    margin: 50px 30px;
     box-sizing: border-box;
     padding: 10px;
     cursor: pointer;
@@ -308,6 +317,15 @@ header > a {
     text-align: justify;
     height: 160px;
     overflow: hidden;
+}
+.comp-cover{
+    width: 100%;
+    min-height: 150px;
+    border-radius: 12px;
+    background-image: url("/static/img/comp-cover.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
 }
 
 
@@ -336,20 +354,33 @@ header > a {
 
 /*Practice Section Css will be Here?*/
 
+.practice-block {
+    max-width: 1125px;
+    min-height: 100vh;
+    background-color: #D8D9D7;
+    margin: auto;
+}
+
+
+/*Practice Section Css will be Here?*/
+
 #practice-block {
     max-width: 1125px;
     min-height: 100vh;
+    background-color: #D8D9D7;
     flex-direction: column;
     flex-wrap: wrap;
 }
 #practice-form-div {
+    display: none;
     justify-content: center;
+    /* You can use Jquery's fade away here */
 }
-#practice-form,#contest-form{
+#practice-form{
     flex-direction: column;
     width: fit-content;
     margin: auto;
-    padding: 20px 50px;
+    padding: 50px;
 }
 .practice-body{
     height: fit-content;
@@ -360,7 +391,8 @@ header > a {
     font-size: 24px;
 }
 .outer{
-    background-color: #D8D9D7;
+    border:0.2 solid black;
+    background-color: #ffffff;
     width:200px;
     border-radius: 8px;
     height: 10px;
@@ -371,15 +403,6 @@ header > a {
     background-color: #26e411;
     border-radius: 8px;
 }
- 
-/*  Competition page css is right here */
-
-.compPageDiv{
-    flex-direction:column;
-    min-width:95%;
-    height:fit-content;
-}
-
 
 /* footer section css will be here */
 
