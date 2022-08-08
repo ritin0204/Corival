@@ -9,7 +9,7 @@ from django.contrib.auth import login,logout,authenticate
 from django.contrib.auth.decorators import login_required
 from .models import Practice,User,Competition,CompResponse,Questions,Notifications
 
-# Create your views here.
+# Create your views here and run them.
 def index(request):
     if request.user.is_authenticated:
         return render(request,'corival/index.html',{"username":request.user.username})
