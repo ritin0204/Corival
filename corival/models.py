@@ -21,7 +21,7 @@ class User(AbstractUser):
     is_manager = models.BooleanField(default=False)
     rating = models.IntegerField(null=True,default=1500)
     bio = models.TextField(null=True,default="Hello there! Just started Competiting.")
-    profile_pic = models.ImageField(blank=True,null=True,verbose_name="profilepic",upload_to='corival/files/profile')
+    profile_pic = models.ImageField(blank=True,null=True,verbose_name="profile_pic",upload_to='corival/files/profile')
 
 class Questions(models.Model):
     statement = models.TextField(unique=True)
