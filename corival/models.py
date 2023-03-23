@@ -23,6 +23,7 @@ class User(AbstractUser):
     bio = models.TextField(null=True,default="Hello there! Just started Competiting.")
     profile_pic = models.ImageField(blank=True,null=True,verbose_name="profile_pic",upload_to='corival/files/profile')
 
+
 class Questions(models.Model):
     statement = models.TextField(unique=True)
     options1 = models.CharField(max_length=150,null=True)

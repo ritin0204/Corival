@@ -402,3 +402,4 @@ def add_questions(request):
         return Response(QuestionsSerializer(Questions.objects.all(),many=True).data)
     else:
         return render(request,"corival/error.html",{"error":"400 : Invalid request"})
+    
