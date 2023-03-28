@@ -19,11 +19,7 @@ def csrf(request):
     return JsonResponse({'csrfToken': get_token(request)})
 
 def index(request):
-    if request.user.is_authenticated:
-        return JsonResponse({"username": request.user.username})
-        return render(request,'corival/index.html',{"userImage":request.user.profile_pic})
-    return JsonResponse({})
-    return render(request,'corival/index.html')
+    return render(request,'frontend/index.html')
 
 
 @login_required
@@ -354,9 +350,11 @@ def login_view(request):
             return JsonResponse({"username": user.username})
             return redirect('index')
         else:
+            return JsonResponse({"error":"Invalid Username or password"})
             return render(request,'corival/login.html',{
                 "error":"Invalid Username or password"
             })
+    return JsonResponse({"error":"Invalid Request"})
     return render(request,'corival/login.html')
 
 @csrf_exempt

@@ -1,5 +1,5 @@
 import axios from 'axios';
-const APP_HOST = 'http://localhost:8000';
+export const APP_HOST = 'http://127.0.0.1:8000';
 
 function setCsrftoken(_csrfToken) {
     document.cookie = `csrftoken=${_csrfToken}`;
@@ -17,23 +17,25 @@ export const getCsrfToken = async () => {
             url: `${APP_HOST}/csrf/`,
             credentials: 'include',
         })
-        let _csrfToken =  (await response).data.csrfToken;
+        let _csrfToken =   (await response).data.csrfToken;
         setCsrftoken(_csrfToken)
         return _csrfToken;
     }
 }
 
-export const fetchRequest = async (path, method, data) => {
+export const fetchRequest = async (path, method='get', data={}) => {
     const response =  axios({
         method: method,
         url: `${APP_HOST}${path}`,
         data: data,
+        credentials: 'include',
+        // withCredentials: true,
         headers: {
-            'X-CSRFToken': await getCsrfToken(),
+            'X-CSRFToken':await getCsrfToken()
         },
     });
-    return (await response).data;
-}
 
+    return await response;
+}
 
 export default fetchRequest;

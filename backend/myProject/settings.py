@@ -39,7 +39,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
-    'corival'
+    'corival',
+    'frontend',
 ]
 
 MIDDLEWARE = [
@@ -129,12 +130,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_ROOT = ''
 MEDIA_URL = ''
 
-
-ACCESS_CONTROL_ALLOW_CREDENTIALS = True
-CORS_ORIGIN_ALLOW_ALL = True
+# ACCESS_CONTROL_ALLOW_ORIGIN = 'http://localhost:3000'
+# ACCESS_CONTROL_ALLOW_CREDENTIALS = True
+# CORS_ORIGIN_ALLOW_ALL = True
 # CORS_ALLOW_HEADERS = ['*']
 
-CSRF_TRUSTED_ORIGINS = ['http://localhost:3000']
-CORS_ORIGIN_WHITELIST = [
-    'http://localhost:3000'
-]
+# CSRF_TRUSTED_ORIGINS = ['http://localhost:3000', 'http://127.0.0.1:3000']
+# CORS_ORIGIN_WHITELIST = [
+#     'http://localhost:3000'
+# ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    )
+}

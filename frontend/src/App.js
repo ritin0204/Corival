@@ -2,6 +2,7 @@ import './App.css';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Header from './components/Header';
 import Home from './components/Home';
+import Login, {Signup} from './components/Login';
 import { Container } from 'reactstrap';
 
 
@@ -13,8 +14,8 @@ function App() {
         <Container>
           <Routes>
             <Route path="/" element={<Home />} />
-            {/* <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} /> */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Signup />} />
           </Routes>
         </Container>
       </BrowserRouter>
