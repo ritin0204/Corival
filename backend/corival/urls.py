@@ -5,10 +5,12 @@ urlpatterns = [
     # /corival
     path('',views.index,name='index'),
     #User-Profile/User details Create,Get, Update and Delete User url
+    path('rivals/user',views.current_user,name='current_user'),
     path('rivals/<str:username>',views.get_user,name='get_user'),
     # Notifications
     path('notifications',views.notifications,name='notifications'),
     #All kinds of Contest
+    path('competitions',views.competitions,name='contest-type'),
     path('competitions/<str:type>',views.competitions,name='contest-type'),
     #all practices
     path('practices/all',views.all_Practices,name='all-practices'),

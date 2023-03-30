@@ -16,3 +16,8 @@
     font-size: 0.8rem;
     letter-spacing: 1px;
 }
+.float-right {
+    position: absolute;
+    right: 0;
+    top: 0;
+}

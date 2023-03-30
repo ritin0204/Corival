@@ -22,6 +22,14 @@ def index(request):
     return render(request,'frontend/index.html')
 
 
+def current_user(request):
+    if request.user.is_authenticated:
+        serializer = UserSerializer(request.user)
+        return JsonResponse(serializer.data)
+    else:
+        return JsonResponse({"message":"No user is logged in"}, status=401)
+
+
 @login_required
 @csrf_exempt
 @api_view(['GET','POST','PUT','DELETE'])
@@ -62,12 +70,12 @@ def get_user(request,username):
 
 @api_view(['GET'])
 @login_required
-def competitions(request,type):
+def competitions(request,type="all"):
     now = timezone.now()
     contests = Competition.objects.all()
     if type == "all":
         serializer = CompetitionSerializer(contests,many=True)
-        return JsonResponse(serializer.data,status=200,safe=False)
+        return Response(serializer.data,status=200)
     elif type == "ongoing":
         return JsonResponse([contest.serialize() for contest in contests if contest.end_time > now],status =200,safe=False)
     elif type == "archived":
@@ -347,15 +355,15 @@ def login_view(request):
         user = authenticate(username=username,password=password)
         if user is not None:
             login(request,user)
-            return JsonResponse({"username": user.username})
-            return redirect('index')
+            userData = UserSerializer(instance=user,many=False)
+            return JsonResponse(userData.data,status=200)
         else:
-            return JsonResponse({"error":"Invalid Username or password"})
+            return JsonResponse({"error":"Invalid Username or password"},status=400)
             return render(request,'corival/login.html',{
                 "error":"Invalid Username or password"
             })
-    return JsonResponse({"error":"Invalid Request"})
-    return render(request,'corival/login.html')
+    # return JsonResponse({"error":"Invalid Request"}, status=400)
+    return render(request,'frontend/index.html')
 
 @csrf_exempt
 def register_view(request):
@@ -364,37 +372,33 @@ def register_view(request):
         email = request.POST['email']
         test_user = User.objects.filter(email=email).count()
         if test_user>0:
-            return render(request,'corival/register.html',{
-                "error":"This Email already exists, Try to login"
-            })
+            return JsonResponse({"error":"Email Already exists"},status=400)
         password = request.POST['password']
-        confirm_pass = request.POST['confirm-pass']
         firstName = request.POST['firstName']
         lastName = request.POST['lastName']
         is_mg = request.POST['purpose']
-        if confirm_pass != password :
-            return render(request,'corival/register.html',{
-                "error":"Your Password Should Match!"
-            })
         try:
             user = User.objects.create_user(username,email,password)
             user.first_name = firstName
             user.last_name = lastName
             user.is_manager = is_mg
-            user.save()
+            print(user)
+            # user.save()
         except IntegrityError:
             user = User.objects.get(username=username)
-            return render(request,'corival/register.html',{
-                "error":"Username Already exists"
-            })
+            return JsonResponse({"error":"Username already exists"},status=400)
         else:
             login(request,user)
-            return redirect('index')
-    return render(request,'corival/register.html')
+            return JsonResponse({"success":"Registered successfully"},status=200)
+    return render(request,'frontend/index.html')
+
+
 
 def logout_view(request):
-    logout(request)
-    return redirect('index')
+    if request.method == "POST":
+        logout(request)
+        return JsonResponse({"success":"Logged out successfully"},status=200)
+    return JsonResponse({"error":"Invalid request"},status=400)
 
 @csrf_exempt
 @api_view(['GET','POST'])

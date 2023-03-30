@@ -1,4 +1,3 @@
-import fetchRequest from '../requests';
 import { useEffect, useState } from 'react';
 import {
     Row,
@@ -8,37 +7,58 @@ import {
     CardTitle,
     Button,
     CardText,
-    Container,
-    CardLink,
+    Container
 } from 'reactstrap';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate} from 'react-router-dom';
+import fetchRequest, { getCurrentUser, setCurrentUser } from '../requests';
 
 
 const Home = () => {
-    const [username, setUsername] = useState("");
+    const [user, setUser] = useState(null);
     useEffect(() => {
-        fetchRequest('/')
-            .then((response) => {
-                setUsername((response.data === {} ? "" : response.data.username));
-            })
-            .catch((error) => {
-                console.log(error);
-            });
+        let response = getCurrentUser();
+        response.then((data) => {
+            setUser(data);
+        });
     }, []);
+    if (user) {
+        return (
+            <Container className='home'>
+                <Sections user={user} />
+            </Container>
+        );
+    }
     return (
         <Container className='home'>
-            {(username ? <Sections username={username}/> : <Intro />)}
+            <Intro />
         </Container>
     );
 }
 
 
-const Sections = (args) => {
+const Sections = (props) => {
+    const navigate = useNavigate();
+    const logOut = () => {
+        fetchRequest('/logout', 'post')
+        .then(response => {
+            setCurrentUser(null);
+            navigate('/');
+        })
+        .catch(error => {
+            console.log(error);
+        });
+    }
+
+
     return (
         <div>
             <Card className="my-4 mx-8" color="secondary" outline>
+                <Button size='sm' color="secondary" className="float-right my-2 mx-2" style={{width:100}} onClick={logOut}>Logout</Button>
                 <CardBody className='card-text'>
-                    <CardTitle tag="h1" className='text-success'>Welcome {args.username}!</CardTitle>
+                    <CardTitle tag="h1" className='text-success'>Welcome {props.user.username}!</CardTitle>
+                    <CardText>
+                        {props.user.bio}
+                    </CardText>
                 </CardBody>
             </Card>
             <Row>
@@ -49,9 +69,9 @@ const Sections = (args) => {
                             <CardText>
                                 Compete with your friends to see who can get the most points.
                             </CardText>
-                            <CardLink href='/compete'>
+                            <Link to={'/compete'}>
                                 <Button size="sm" color="primary">Compete</Button>
-                            </CardLink>
+                            </Link>
                         </CardBody>
                     </Card>
                 </Col>
@@ -62,9 +82,9 @@ const Sections = (args) => {
                             <CardText>
                                 Practice your skills with our practice mode.
                             </CardText>
-                            <CardLink href='/practice'>
+                            <Link to={'/practice'}>
                                 <Button size="sm" color="primary">Practice</Button>
-                            </CardLink>
+                            </Link>
                         </CardBody>
                     </Card>
                 </Col>
@@ -77,9 +97,9 @@ const Sections = (args) => {
                             <CardText>
                                 Challenge your friends to a game of chess.
                             </CardText>
-                            <CardLink href='/challenge'>
+                            <Link to={'/challenge'}>
                                 <Button size="sm" color="primary">Challenge</Button>
-                            </CardLink>
+                            </Link>
                         </CardBody>
                     </Card>
                 </Col>
@@ -90,9 +110,9 @@ const Sections = (args) => {
                             <CardText>
                                 Learn concepts and techniques with our tutorial.
                             </CardText>
-                            <CardLink href='/learn'>
+                            <Link to={'/learn'}>
                                 <Button size="sm" color="primary">Learn</Button>
-                            </CardLink>
+                            </Link>
                         </CardBody>
                     </Card>
                 </Col>

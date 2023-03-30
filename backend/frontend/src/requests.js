@@ -22,6 +22,33 @@ export const getCsrfToken = async () => {
     }
 }
 
+let currentUser = null;
+
+export function setCurrentUser(user) {
+    currentUser = user;
+}
+
+export const getCurrentUser = async () => {
+    if (currentUser) {
+        return currentUser;
+    }
+    else {
+        const response = axios({
+            method: 'get',
+            url: `/rivals/user`,
+            credentials: 'include',
+        })
+        currentUser = (await response).data;
+        if (response.status === 401){
+            currentUser = null;
+            return null
+        }
+        setCurrentUser(currentUser);
+        return currentUser;
+    }
+}
+
+
 export const fetchRequest = async (path, method='get', data={}) => {
     axios.defaults.xsrfCookieName = 'csrftoken';
     axios.defaults.xsrfHeaderName = 'X-CSRFToken';
