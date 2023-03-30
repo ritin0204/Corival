@@ -1,0 +1,39 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"> -->
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+    <title>Login | Corival</title>
+</head>
+<body>
+    <div class="login-page">
+        <div class="login-form">
+            <h2>Login</h2>
+            {% if error %}
+            <div class="error">
+                <p>
+                    {{error}}
+                </p>
+            </div>
+        {% endif %}
+            <form action="{% url 'login-view' %}" method="post" class="auth-form">
+                {% csrf_token %}
+                <label for="username">
+                    <p>Username</p>
+                    <input type="text" name="username" id="username" placeholder="Username" required>
+                </label>
+                <label for="password">
+                    <p>Password</p>
+                    <input type="password" name="password" id="password" placeholder="Password" required>
+                </label><br>
+                <input type="submit" class="btn-submit" value="Login">
+            </form>
+            <p>Not registered yet?<a href="{% url 'register-view' %}">click here</a></p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat&family=Cinzel+Decorative&family=Dancing+Script:wght@500&family=Open+Sans:wght@300&display=swap');
+
+.brand-text {
+    text-decoration: none;
+    font-size: 1.5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: white;
+    padding-right: 2rem;
+    font-family: 'Cinzel Decorative', cursive;
+    text-align: center;
+    letter-spacing: 2px;
+}
+.card-text {
+    font-family: monospace;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+}
+.float-right {
+    position: absolute;
+    right: 0;
+    top: 0;
+}
