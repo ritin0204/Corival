@@ -42,7 +42,8 @@ const Sections = (props) => {
         fetchRequest('/logout', 'post')
         .then(response => {
             setCurrentUser(null);
-            navigate('/');
+            window.location.reload();
+            // navigate('/');
         })
         .catch(error => {
             console.log(error);
