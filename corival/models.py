@@ -57,6 +57,7 @@ class Apptitude(models.Model):
     question = models.TextField()
     category = models.CharField(max_length=100, choices=APPTITUDE_CHOICES, default=APPTITUDE_CHOICES[0][0])
     difficulty = models.IntegerField(default=1)
+    added_by = models.ForeignKey("User", related_name="choices", on_delete=models.CASCADE, default=1)
     
     def __str__(self):
         return self.question
@@ -78,104 +79,104 @@ class Choice(models.Model):
         ordering = ("position",)
     
     
-# class Contest(models.Model):
-#     title = models.CharField(max_length=100)
-#     start_time = models.DateTimeField()
-#     end_time = models.DateTimeField()
-#     description = models.TextField()
-#     category = models.CharField(max_length=100, choices=APPTITUDE_CHOICES, default=APPTITUDE_CHOICES[0][0])
-#     difficulty = models.IntegerField(default=1)
-#     questions = models.ManyToManyField(Apptitude)
-#     created_by = models.ForeignKey("User", related_name="contests", on_delete=models.CASCADE)
-#     created_at = models.DateTimeField(auto_now_add=True)
+class Contest(models.Model):
+    title = models.CharField(max_length=100)
+    start_time = models.DateTimeField()
+    end_time = models.DateTimeField()
+    description = models.TextField()
+    category = models.CharField(max_length=100, choices=APPTITUDE_CHOICES, default=APPTITUDE_CHOICES[0][0])
+    difficulty = models.IntegerField(default=1)
+    questions = models.ManyToManyField(Apptitude)
+    created_by = models.ForeignKey("User", related_name="contests", on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
     
-#     def __str__(self):
-#         return self.name
-    
-
-# class ContestSubmission(models.Model):
-#     contest = models.ForeignKey("Contest", related_name="submissions", on_delete=models.CASCADE)
-#     user = models.ForeignKey("User", related_name="submissions", on_delete=models.CASCADE)
-#     apptitude = models.ForeignKey("Apptitude", related_name="submissions", on_delete=models.CASCADE)
-#     timm_took = models.TimeField()
-#     answer = models.BooleanField(default=False)
-    
-#     def __str__(self):
-#         return self.user.username
-
-    
-# class ContestLeaderboard(models.Model):
-#     contest = models.ForeignKey("Contest", related_name="leaderboard", on_delete=models.CASCADE)
-#     user = models.ForeignKey("User", related_name="leaderboard", on_delete=models.CASCADE)
-#     score = models.IntegerField(default=0)
-    
-#     class Meta:
-#         ordering = ["-score"]
-        
-        
-#     def __str__(self):
-#         return self.user.username
+    def __str__(self):
+        return self.name
     
 
-# class Challenge(models.Model):
-#     sender = models.ForeignKey("Candidate", related_name="challenges_sent", on_delete=models.CASCADE)
-#     reciever = models.ForeignKey("Candidate", related_name="challenges_recieved", on_delete=models.CASCADE)
+class ContestSubmission(models.Model):
+    contest = models.ForeignKey("Contest", related_name="submissions", on_delete=models.CASCADE)
+    user = models.ForeignKey("User", related_name="submissions", on_delete=models.CASCADE)
+    apptitude = models.ForeignKey("Apptitude", related_name="submissions", on_delete=models.CASCADE)
+    timm_took = models.TimeField()
+    answer = models.BooleanField(default=False)
     
-#     note = models.TextField(default="No Note")
-#     difficulty = models.IntegerField(default=1)
-#     category = models.CharField(max_length=100, choices=APPTITUDE_CHOICES, default=APPTITUDE_CHOICES[0][0])
-#     questions = models.ManyToManyField(Apptitude)
-#     start_time = models.DateTimeField(auto_now_add=True)
-#     end_time = models.DateTimeField(default= datetime.datetime.now() + datetime.timedelta(days=1))
+    def __str__(self):
+        return self.user.username
+
     
-#     def __str__(self):
-#         return self.sender.username
+class ContestLeaderboard(models.Model):
+    contest = models.ForeignKey("Contest", related_name="leaderboard", on_delete=models.CASCADE)
+    user = models.ForeignKey("User", related_name="leaderboard", on_delete=models.CASCADE)
+    score = models.IntegerField(default=0)
     
-    
-# class ChallengeSubmission(models.Model):
-#     challenge = models.ForeignKey("Challenge", related_name="submissions", on_delete=models.CASCADE)
-#     user = models.ForeignKey("User", related_name="challenge_submissions", on_delete=models.CASCADE)
-#     apptitude = models.ForeignKey("Apptitude", related_name="challenge_submissions", on_delete=models.CASCADE)
-#     timm_took = models.TimeField()
-#     answer = models.BooleanField(default=False)
-    
-#     def __str__(self):
-#         return self.user.username
-    
-    
-# class ChallengeLeaderboard(models.Model):
-#     challenge = models.ForeignKey("Challenge", related_name="leaderboard", on_delete=models.CASCADE)
-#     user = models.ForeignKey("User", related_name="challenge_leaderboard", on_delete=models.CASCADE)
-#     score = models.IntegerField(default=0)
-    
-    
-#     class Meta:
-#         ordering = ["-score"]
-        
-# class Practice(models.Model):
-#     created_by = models.ForeignKey("User", related_name="practice", on_delete=models.CASCADE)
-#     difficulty = models.IntegerField(default=1)
-#     category = models.CharField(max_length=100, choices=APPTITUDE_CHOICES, default=APPTITUDE_CHOICES[0][0])
-#     questions = models.ManyToManyField(Apptitude)
-#     start_time = models.DateTimeField(auto_now_add=True)
-#     end_time = models.DateTimeField()
-#     score = models.IntegerField(default=0)
-    
-    
-#     def __str__(self):
-#         return self.user.username
+    class Meta:
+        ordering = ["-score"]
         
         
-# class PracticeSubmission(models.Model):
-#     practice = models.ForeignKey("Practice", related_name="submissions", on_delete=models.CASCADE)
-#     user = models.ForeignKey("User", related_name="practice_submissions", on_delete=models.CASCADE)
-#     apptitude = models.ForeignKey("Apptitude", related_name="practice_submissions", on_delete=models.CASCADE)
-#     timm_took = models.TimeField()
-#     answer = models.BooleanField(default=False)
+    def __str__(self):
+        return self.user.username
+    
+
+class Challenge(models.Model):
+    sender = models.ForeignKey("Candidate", related_name="challenges_sent", on_delete=models.CASCADE)
+    reciever = models.ForeignKey("Candidate", related_name="challenges_recieved", on_delete=models.CASCADE)
+    
+    note = models.TextField(default="No Note")
+    difficulty = models.IntegerField(default=1)
+    category = models.CharField(max_length=100, choices=APPTITUDE_CHOICES, default=APPTITUDE_CHOICES[0][0])
+    questions = models.ManyToManyField(Apptitude)
+    start_time = models.DateTimeField(auto_now_add=True)
+    end_time = models.DateTimeField(default= datetime.datetime.now() + datetime.timedelta(days=1))
+    
+    def __str__(self):
+        return self.sender.username
     
     
-#     def __str__(self):
-#         return self.practice.id
+class ChallengeSubmission(models.Model):
+    challenge = models.ForeignKey("Challenge", related_name="submissions", on_delete=models.CASCADE)
+    user = models.ForeignKey("User", related_name="challenge_submissions", on_delete=models.CASCADE)
+    apptitude = models.ForeignKey("Apptitude", related_name="challenge_submissions", on_delete=models.CASCADE)
+    timm_took = models.TimeField()
+    answer = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return self.user.username
+    
+    
+class ChallengeLeaderboard(models.Model):
+    challenge = models.ForeignKey("Challenge", related_name="leaderboard", on_delete=models.CASCADE)
+    user = models.ForeignKey("User", related_name="challenge_leaderboard", on_delete=models.CASCADE)
+    score = models.IntegerField(default=0)
+    
+    
+    class Meta:
+        ordering = ["-score"]
+        
+class Practice(models.Model):
+    created_by = models.ForeignKey("User", related_name="practice", on_delete=models.CASCADE, default=1)
+    difficulty = models.IntegerField(default=1)
+    category = models.CharField(max_length=100, choices=APPTITUDE_CHOICES, default=APPTITUDE_CHOICES[0][0])
+    questions = models.ManyToManyField(Apptitude)
+    start_time = models.DateTimeField(auto_now_add=True)
+    end_time = models.DateTimeField()
+    score = models.IntegerField(default=0)
+    
+    
+    def __str__(self):
+        return self.user.username
+        
+        
+class PracticeSubmission(models.Model):
+    practice = models.ForeignKey("Practice", related_name="submissions", on_delete=models.CASCADE, default=1)
+    user = models.ForeignKey("User", related_name="practice_submissions", on_delete=models.CASCADE, default=1)
+    apptitude = models.ForeignKey("Apptitude", related_name="practice_submissions", on_delete=models.CASCADE, default=1)
+    timm_took = models.TimeField()
+    answer = models.BooleanField(default=False)
+    
+    
+    def __str__(self):
+        return self.practice.id
     
     
 

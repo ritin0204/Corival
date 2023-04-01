@@ -5,7 +5,9 @@ from django.shortcuts import render
 from django.contrib.auth import login,logout,authenticate
 from django.contrib.auth.decorators import login_required
 from rest_framework.response import Response
-from django.middleware.csrf import get_token
+from django.contrib.auth.models import User
+from django.views.generic import TemplateView
+from django.utils.decorators import method_decorator
 
 
 from rest_framework import viewsets
@@ -34,88 +36,72 @@ class ApptitudeViewSet(viewsets.ModelViewSet):
     serializer_class = ApptitudeSerializer
     
     
-# class ContestViewSet(viewsets.ModelViewSet):
-#     queryset = Contest.objects.all()
-#     serializer_class = ContestSerializer
+class ContestViewSet(viewsets.ModelViewSet):
+    queryset = Contest.objects.all()
+    serializer_class = ContestSerializer
     
     
-# class ContestSubmissionViewSet(viewsets.ModelViewSet):
-#     queryset = ContestSubmission.objects.all()
-#     serializer_class = ContestSubmissionSerializer
+class ContestSubmissionViewSet(viewsets.ModelViewSet):
+    queryset = ContestSubmission.objects.all()
+    serializer_class = ContestSubmissionSerializer
     
     
-# class ContestLeaderboardViewSet(viewsets.ModelViewSet):
-#     queryset = ContestLeaderboard.objects.all()
-#     serializer_class = ContestLeaderboardSerializer
+class ContestLeaderboardViewSet(viewsets.ModelViewSet):
+    queryset = ContestLeaderboard.objects.all()
+    serializer_class = ContestLeaderboardSerializer
 
 
-# class ChallengeViewSet(viewsets.ModelViewSet):
-#     queryset = Challenge.objects.all()
-#     serializer_class = ChallengeSerializer
+class ChallengeViewSet(viewsets.ModelViewSet):
+    queryset = Challenge.objects.all()
+    serializer_class = ChallengeSerializer
     
     
-# class ChallengeSubmissionViewSet(viewsets.ModelViewSet):
-#     queryset = ChallengeSubmission.objects.all()
-#     serializer_class = ChallengeSubmissionSerializer
+class ChallengeSubmissionViewSet(viewsets.ModelViewSet):
+    queryset = ChallengeSubmission.objects.all()
+    serializer_class = ChallengeSubmissionSerializer
     
     
-# class ChallengeLeaderboardViewSet(viewsets.ModelViewSet):
-#     queryset = ChallengeLeaderboard.objects.all()
-#     serializer_class = ChallengeLeaderboardSerializer
+class ChallengeLeaderboardViewSet(viewsets.ModelViewSet):
+    queryset = ChallengeLeaderboard.objects.all()
+    serializer_class = ChallengeLeaderboardSerializer
     
     
-# class PracticeViewSet(viewsets.ModelViewSet):
-#     queryset = Practice.objects.all()
-#     serializer_class = PracticeSerializer
+class PracticeViewSet(viewsets.ModelViewSet):
+    queryset = Practice.objects.all()
+    serializer_class = PracticeSerializer
     
     
-# class PracticeSubmissionViewSet(viewsets.ModelViewSet):
-#     queryset = PracticeSubmission.objects.all()
-#     serializer_class = PracticeSubmissionSerializer
+class PracticeSubmissionViewSet(viewsets.ModelViewSet):
+    queryset = PracticeSubmission.objects.all()
+    serializer_class = PracticeSubmissionSerializer
 
 
+class AuthView(TemplateView):
+    template_name = 'frontend/index.html'
+    
+    @method_decorator(csrf_exempt)
+    def post(self,request):
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(username=username,password=password)
+        if user is not None:
+            login(request,user)
+            userData = UserSerializer(instance=user,many=False)
+            return Response(userData.data,status=200)
+        else:
+            return JsonResponse({"error":"Invalid Username or password"},status=400)
 
 
+# def csrf(request):
+#     return 
+
+def current_user(request):
+    if request.user.is_authenticated:
+        serializer = UserSerializer(request.user)
+        return JsonResponse(serializer.data)
+    return JsonResponse({"error":"User not logged in"},status=400)
 
 
-
-
-
-
-
-
-def csrf(request):
-    return JsonResponse({'csrfToken': get_token(request)})
-
-def index(request):
-    return render(request,'frontend/index.html')
-
-
-# def current_user(request):
-#     if request.user.is_authenticated:
-#         serializer = UserSerializer(request.user)
-#         return JsonResponse(serializer.data)
-#     else:
-#         return JsonResponse({"message":"No user is logged in"}, status=401)
-
-
-# @csrf_exempt
-# def login_view(request):
-#     if request.method =="POST":
-#         username = request.POST['username']
-#         password = request.POST['password']
-#         user = authenticate(username=username,password=password)
-#         if user is not None:
-#             login(request,user)
-#             userData = UserSerializer(instance=user,many=False)
-#             return JsonResponse(userData.data,status=200)
-#         else:
-#             return JsonResponse({"error":"Invalid Username or password"},status=400)
-#             return render(request,'corival/login.html',{
-#                 "error":"Invalid Username or password"
-#             })
-#     # return JsonResponse({"error":"Invalid Request"}, status=400)
-#     return render(request,'frontend/index.html')
 
 # @csrf_exempt
 # def register_view(request):

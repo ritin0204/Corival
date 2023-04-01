@@ -23,7 +23,8 @@ from django.views.generic import TemplateView
 
 urlpatterns = [
     path('',include('corival.urls')),
-    path('csrf/', views.csrf),
+    # returninng csrf token as json
+    path('csrf/', views.csrf, name='csrf' ),
     path('admin/', admin.site.urls),
     re_path(r'^.*', TemplateView.as_view(template_name='frontend/index.html')),
 ]
