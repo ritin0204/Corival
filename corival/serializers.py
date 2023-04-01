@@ -1,59 +1,85 @@
-from .models import Challenges, CompResponse, Competition, Notifications, Practice, Questions, User
 from rest_framework import serializers
+from .models import *
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = [
-            'profile_pic',
-            'username',
-            'first_name', 
-            'last_name', 
-            'email', 
-            'last_login', 
-            'is_manager', 
-            'is_superuser', 
-            'rating', 
-            'bio',
-            'date_joined'
-            ]
+        fields = ['username', 'email', 'first_name', 'last_name', 'date_joined', 'description', 'phone', 'is_recruiter', 'is_candidate']
+        
 
-class QuestionsSerializer(serializers.ModelSerializer):
+class CandidateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Questions
-        fields = [
-            'id',
-            'statement',
-            'options1',
-            'options2',
-            'options3',
-            'options4',
-            'category',
-        ]
-
-class CompetitionSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Competition
+        model = Candidate
         fields = '__all__'
 
-class PracticeSerializer(serializers.ModelSerializer):
+        
+        
+class RecruiterSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Practice
+        model = Recruiter
         fields = '__all__'
 
-class CompResponseSerializer(serializers.ModelSerializer):
+        
+class ChoiceSerializer(serializers.ModelSerializer):
     class Meta:
-        model = CompResponse
-        fields = '__all__'
+        model = Choice
+        fields = ('question', 'choice', 'position', 'answer_position')
+        
 
-class NotificationsSerializer(serializers.ModelSerializer):
+class ApptitudeSerializer(serializers.ModelSerializer):
+    choices = ChoiceSerializer(many=True, read_only=True)
     class Meta:
-        model = Notifications
-        ordering = ['-created_time']
-        fields = '__all__'
+        model = Apptitude
+        fields = ('id', 'question', 'choices', 'category', 'difficulty')
+        
+        
+        
+# class ContestSerializer(serializers.ModelSerializer):
+#     apptitude = ApptitudeSerializer(many=True, read_only=True)
+#     class Meta:
+#         model = Contest
+#         fields = '__all__'
+        
 
-class ChallengeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Challenges
-        ordering = ['-end_time']
-        fields = '__all__'
+# class ContestSubmissionSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = ContestSubmission
+#         fields = '__all__'
+        
+
+# class ContestLeaderboardSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = ContestLeaderboard
+#         fields = '__all__'
+        
+# class ChallengeSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Challenge
+#         fields = '__all__'
+        
+        
+# class ChallengeSubmissionSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = ChallengeSubmission
+#         fields = '__all__'
+        
+
+# class ChallengeLeaderboardSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = ChallengeLeaderboard
+#         fields = '__all__'
+        
+        
+# class PracticeSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Practice
+#         fields = '__all__'
+        
+        
+# class PracticeSubmissionSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = PracticeSubmission
+#         fields = '__all__'
+        
+        

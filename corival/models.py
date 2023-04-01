@@ -2,133 +2,181 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 import datetime
 
-# Choices Feilds
-APPTITUDE_TYPES = [
-    ('PR','Percentage'),
-    ('P&L','Profit and loss'),
-    ('DC','Discount'),
-    ('SI','Simple Interest')
-]
-ALERT_TYPES = [
-    ('CH','Challenge'),
-    ('COMP','Competition'),
-    ('USR','User'),
-    ('PRC','Practice')
-]
-
 # Create your models here.
 class User(AbstractUser):
-    is_manager = models.BooleanField(default=False)
-    rating = models.IntegerField(null=True,default=1500)
-    bio = models.TextField(null=True,default="Hello there! Just started Competiting.")
-    profile_pic = models.ImageField(blank=True,null=True,verbose_name="profile_pic",upload_to='corival/files/profile')
+    username = models.CharField(max_length=100, unique=True, primary_key=True)
+    description = models.TextField(blank=True)
+    phone = models.CharField(max_length=10, blank=True)
+    is_recruiter = models.BooleanField(default=False)
+    is_candidate = models.BooleanField(default=False)
+    
+    def __str__(self):
+        return self.pk
+    
+    
+class Candidate(User):
+    mathematics = models.IntegerField(default=0)
+    # Rest Will be Other details like Expirence, Projects, skills resume etc.
+    
+    def __str__(self):
+        return self.username
+    
+
+class Recruiter(User):
+    company = models.CharField(max_length=100, blank=True)
+    verified = models.BooleanField(default=False)
+    position = models.CharField(max_length=100, blank=True)
+    # Rest Will be Other details like Expirence, Projects, skills resume etc.
+    
+    def __str__(self):
+        return self.username
+        
+
+# defines all choices for the category below like profit and loss, time and work etc.
+APPTITUDE_CHOICES = (
+    ['All', 'All'],
+    ['Profit and Loss', 'Profit and Loss'],
+    ['Time and Work', 'Time and Work'],
+    ['Time and Distance', 'Time and Distance'],
+    ['Number System', 'Number System'],
+    ['Average', 'Average'],
+    ['Percentage', 'Percentage'],
+    ['Ratio and Proportion', 'Ratio and Proportion'],
+    ['Mensuration', 'Mensuration'],
+    ['Simple Interest', 'Simple Interest'],
+    ['Compound Interest', 'Compound Interest'],
+    ['Algebra', 'Algebra'],
+    ['Geometry', 'Geometry'],
+    ['Trigonometry', 'Trigonometry'],
+    ['Data Interpretation', 'Data Interpretation'],
+    ['Miscellaneous', 'Miscellaneous']
+)
+    
+    
+class Apptitude(models.Model):
+    question = models.TextField()
+    category = models.CharField(max_length=100, choices=APPTITUDE_CHOICES, default=APPTITUDE_CHOICES[0][0])
+    difficulty = models.IntegerField(default=1)
+    
+    def __str__(self):
+        return self.question
 
 
-class Questions(models.Model):
-    statement = models.TextField(unique=True)
-    options1 = models.CharField(max_length=150,null=True)
-    options2 = models.CharField(max_length=150,null=True)
-    options3 = models.CharField(max_length=150,null=True)
-    options4 = models.CharField(max_length=150,null=True)
-    right_answer = models.CharField(max_length=150)
-    category = models.CharField(max_length=100,choices=APPTITUDE_TYPES)
+class Choice(models.Model):
+    question = models.ForeignKey("Apptitude", related_name="choices", on_delete=models.CASCADE)
+    choice = models.CharField("Choice", max_length=50)
+    position = models.IntegerField("position")
+    answer_position = models.IntegerField("answer_position")
+    
+    class Meta:
+        unique_together = [
+            # no duplicated choice per question
+            ("question", "choice"), 
+            # no duplicated position per question 
+            ("question", "position") 
+        ]
+        ordering = ("position",)
+    
+    
+# class Contest(models.Model):
+#     title = models.CharField(max_length=100)
+#     start_time = models.DateTimeField()
+#     end_time = models.DateTimeField()
+#     description = models.TextField()
+#     category = models.CharField(max_length=100, choices=APPTITUDE_CHOICES, default=APPTITUDE_CHOICES[0][0])
+#     difficulty = models.IntegerField(default=1)
+#     questions = models.ManyToManyField(Apptitude)
+#     created_by = models.ForeignKey("User", related_name="contests", on_delete=models.CASCADE)
+#     created_at = models.DateTimeField(auto_now_add=True)
+    
+#     def __str__(self):
+#         return self.name
+    
 
-    def serialize(self):
-        return {
-            'id':self.id,
-            'statement':self.statement,
-            'option1':self.options1,
-            'option2':self.options2,
-            'option3':self.options3,
-            'option4':self.options4,
-            'rans':self.right_answer
-        }
+# class ContestSubmission(models.Model):
+#     contest = models.ForeignKey("Contest", related_name="submissions", on_delete=models.CASCADE)
+#     user = models.ForeignKey("User", related_name="submissions", on_delete=models.CASCADE)
+#     apptitude = models.ForeignKey("Apptitude", related_name="submissions", on_delete=models.CASCADE)
+#     timm_took = models.TimeField()
+#     answer = models.BooleanField(default=False)
+    
+#     def __str__(self):
+#         return self.user.username
 
-class Competition(models.Model):
-    name = models.CharField(max_length=150,blank=False,unique=True)
-    createdBy = models.ForeignKey("User",on_delete=models.CASCADE)
-    start_time = models.DateTimeField(blank=False,default=datetime.datetime.now())
-    end_time = models.DateTimeField(blank=False,default=datetime.datetime.now() + datetime.timedelta(days=1))
-    duration = models.DurationField(blank=False)
-    archive = models.BooleanField(default=False)
-    description = models.TextField(null=True)
-    participients = models.ManyToManyField("User",related_name='participients',blank=True)
-    questions = models.ManyToManyField("Questions",related_name='questions',blank=True)
-    no_of_questions = models.IntegerField(default=20)
+    
+# class ContestLeaderboard(models.Model):
+#     contest = models.ForeignKey("Contest", related_name="leaderboard", on_delete=models.CASCADE)
+#     user = models.ForeignKey("User", related_name="leaderboard", on_delete=models.CASCADE)
+#     score = models.IntegerField(default=0)
+    
+#     class Meta:
+#         ordering = ["-score"]
+        
+        
+#     def __str__(self):
+#         return self.user.username
+    
 
-    def serialize(self):
-        return {
-            'id':self.id,
-            'name':self.name,
-            'createdBy':self.createdBy.username,
-            'startTime':self.start_time,
-            'endTime':self.end_time,
-            'duration' :self.duration,
-            'participients':[user.username for user in self.participients.all()],
-            'archive':self.archive,
-            'description':self.description,
-            'noOfQuestion':self.no_of_questions,
-        }
+# class Challenge(models.Model):
+#     sender = models.ForeignKey("Candidate", related_name="challenges_sent", on_delete=models.CASCADE)
+#     reciever = models.ForeignKey("Candidate", related_name="challenges_recieved", on_delete=models.CASCADE)
+    
+#     note = models.TextField(default="No Note")
+#     difficulty = models.IntegerField(default=1)
+#     category = models.CharField(max_length=100, choices=APPTITUDE_CHOICES, default=APPTITUDE_CHOICES[0][0])
+#     questions = models.ManyToManyField(Apptitude)
+#     start_time = models.DateTimeField(auto_now_add=True)
+#     end_time = models.DateTimeField(default= datetime.datetime.now() + datetime.timedelta(days=1))
+    
+#     def __str__(self):
+#         return self.sender.username
+    
+    
+# class ChallengeSubmission(models.Model):
+#     challenge = models.ForeignKey("Challenge", related_name="submissions", on_delete=models.CASCADE)
+#     user = models.ForeignKey("User", related_name="challenge_submissions", on_delete=models.CASCADE)
+#     apptitude = models.ForeignKey("Apptitude", related_name="challenge_submissions", on_delete=models.CASCADE)
+#     timm_took = models.TimeField()
+#     answer = models.BooleanField(default=False)
+    
+#     def __str__(self):
+#         return self.user.username
+    
+    
+# class ChallengeLeaderboard(models.Model):
+#     challenge = models.ForeignKey("Challenge", related_name="leaderboard", on_delete=models.CASCADE)
+#     user = models.ForeignKey("User", related_name="challenge_leaderboard", on_delete=models.CASCADE)
+#     score = models.IntegerField(default=0)
+    
+    
+#     class Meta:
+#         ordering = ["-score"]
+        
+# class Practice(models.Model):
+#     created_by = models.ForeignKey("User", related_name="practice", on_delete=models.CASCADE)
+#     difficulty = models.IntegerField(default=1)
+#     category = models.CharField(max_length=100, choices=APPTITUDE_CHOICES, default=APPTITUDE_CHOICES[0][0])
+#     questions = models.ManyToManyField(Apptitude)
+#     start_time = models.DateTimeField(auto_now_add=True)
+#     end_time = models.DateTimeField()
+#     score = models.IntegerField(default=0)
+    
+    
+#     def __str__(self):
+#         return self.user.username
+        
+        
+# class PracticeSubmission(models.Model):
+#     practice = models.ForeignKey("Practice", related_name="submissions", on_delete=models.CASCADE)
+#     user = models.ForeignKey("User", related_name="practice_submissions", on_delete=models.CASCADE)
+#     apptitude = models.ForeignKey("Apptitude", related_name="practice_submissions", on_delete=models.CASCADE)
+#     timm_took = models.TimeField()
+#     answer = models.BooleanField(default=False)
+    
+    
+#     def __str__(self):
+#         return self.practice.id
+    
+    
 
-class Practice(models.Model):
-    title = models.TextField(max_length=100,null=True)
-    user = models.ForeignKey("User",on_delete=models.CASCADE)
-    duration = models.DurationField(blank=False)
-    questions = models.ManyToManyField("Questions",related_name='practicequestions')
-    no_of_questions = models.IntegerField(default=20)
-    score = models.IntegerField(blank=True,null=True)
-
-    def serialize(self):
-        return {
-            'id':self.id,
-            'duration' :self.duration,
-            'noOfQuestion':self.no_of_questions,
-            'score':self.score
-        }
-
-class CompResponse(models.Model):
-    compId = models.ForeignKey("Competition",on_delete=models.CASCADE)
-    userId = models.ForeignKey("User",on_delete=models.CASCADE)
-    start_time = models.DateTimeField(auto_now_add=True,null=True)
-    score = models.IntegerField(null=True)
-
-    def serialize(self):
-        return {
-            "userName": self.userId.username,
-            "score":self.score
-        }
-
-class Notifications(models.Model):
-    message = models.TextField()
-    message_url = models.TextField()
-    read = models.BooleanField(default=False)
-    user = models.ForeignKey("User",on_delete=models.CASCADE)
-    alerType = models.CharField(max_length=100,choices=ALERT_TYPES,null=True,default=None)
-    created_time = models.DateTimeField(auto_now_add=True,editable=False)
-
-    def serialize(self):
-        return {
-            "messege": self.message,
-            "message_url": self.message_url,
-            "created_time":self.created_time,
-            "read" : self.read
-        }
-
-class Challenges(models.Model):
-    name = models.CharField(max_length=150,blank=False,unique=True)
-    createdBy = models.ForeignKey("User",on_delete=models.CASCADE,related_name="challenger")
-    start_time = models.DateTimeField(blank=False,default=datetime.datetime.now())
-    end_time = models.DateTimeField(blank=False,default=datetime.datetime.now() + datetime.timedelta(days=1))
-    duration = models.DurationField(blank=False)
-    opponent = models.ForeignKey("User",on_delete=models.CASCADE,related_name="chllengee")
-    questions = models.ManyToManyField("Questions",related_name='challenge_questions',blank=True)
-    user_score = models.IntegerField(blank=True,null=True)
-    opponent_score = models.IntegerField(blank=True,null=True)
-    no_of_questions = models.IntegerField(default=20)
-    finished = models.BooleanField(default=False)
-
-    def __init__(self, *args, **kwargs) -> None:
-        super().__init__(*args, **kwargs)
-        if self.end_time.replace(tzinfo=None)<=datetime.datetime.now().replace(tzinfo=None) and not self.finished:
-            self.delete()
-            return None
+    
