@@ -1,7 +1,8 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Header from './Header';
 import Home from './Home';
-import Login, {Signup} from './Login';
+import Login from './Login';
+import {RecruiterSignup, CandidateSignup} from './Signup';
 import { Container } from 'reactstrap';
 
 
@@ -32,7 +33,8 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Signup />} />
+            <Route path="/candidates/register" element={<CandidateSignup />} />
+            <Route path="/recruiters/register" element={<RecruiterSignup />} />
             <Route path="/compete" element={<Competitions/>} />
             <Route path="/*" element={<NotFound />} />
           </Routes>

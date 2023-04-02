@@ -3,7 +3,6 @@ from .views import *
 from rest_framework import routers
 from django.views.generic import TemplateView
 
-
 routes = routers.DefaultRouter()
 
 # User Routes
@@ -35,8 +34,7 @@ urlpatterns = [
     path('api/',include(routes.urls)),
     
     # For Authentication
-    path('rivals/user',current_user,name='current_user'),
+    path('rivals/user',current_user,name='current_user'), # path('register',views.register_view,name='register-view'),
     path('login',AuthView.as_view(), name='login-view'),
-    # path('register',views.register_view,name='register-view'),
-    # path('logout',views.logout_view,name='logout-view'),
+    path('logout',logout_view,name='logout-view'),
 ]

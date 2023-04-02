@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+
 function setCsrftoken(_csrfToken) {
     document.cookie = `csrftoken=${_csrfToken}`;
 }

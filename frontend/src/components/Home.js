@@ -7,7 +7,8 @@ import {
     CardTitle,
     Button,
     CardText,
-    Container
+    Container,
+    CardHeader
 } from 'reactstrap';
 import { Link, useNavigate} from 'react-router-dom';
 import fetchRequest, { getCurrentUser, setCurrentUser } from '../requests';
@@ -58,7 +59,7 @@ const Sections = (props) => {
                 <CardBody className='card-text'>
                     <CardTitle tag="h1" className='text-success'>Welcome {props.user.username}!</CardTitle>
                     <CardText>
-                        {props.user.bio}
+                        {props.user.description}
                     </CardText>
                 </CardBody>
             </Card>
@@ -125,6 +126,41 @@ const Sections = (props) => {
 
 const Intro = () => {
     return (
+        <Container>
+            <Row>
+                <Col sm="6">
+                    <Card className="my-2" color="secondary" outline>
+                        <CardBody>
+                            <CardText>
+                                You are here for...
+                            </CardText>
+                            <CardTitle tag="h5">Prepare</CardTitle>
+                            <CardText>
+                                Compete with your friends to see who can get the most points.
+                            </CardText>
+                            <Link to={'/candidates/register'}>
+                                <Button size="sm" color="primary">Register Here</Button>
+                            </Link>
+                        </CardBody>
+                    </Card>
+                </Col>
+                <Col sm="6">
+                <Card className="my-2" color="secondary" outline>
+                        <CardBody>
+                            <CardText>
+                                You are here for...
+                            </CardText>
+                            <CardTitle tag="h5">Hiring</CardTitle>
+                            <CardText>
+                                Hire the best candidates with our aptitude tests.
+                            </CardText>
+                            <Link to={'/recruiters/register'}>
+                                <Button size="sm" color="primary">Register Here</Button>
+                            </Link>
+                        </CardBody>
+                    </Card>
+                </Col>
+            </Row>
         <Card className="my-4 mx-8" color="secondary" outline>
             <CardBody className='card-text'>
                 <CardTitle tag="h1" className='text-success'>Welcome to Corival!</CardTitle>
@@ -146,6 +182,7 @@ const Intro = () => {
                 </CardText>
             </CardBody>
         </Card>
+        </Container>
     );
 }
 export default Home;

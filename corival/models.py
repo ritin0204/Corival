@@ -5,7 +5,6 @@ import datetime
 # Create your models here.
 class User(AbstractUser):
     username = models.CharField(max_length=100, unique=True, primary_key=True)
-    description = models.TextField(blank=True)
     phone = models.CharField(max_length=10, blank=True)
     is_recruiter = models.BooleanField(default=False)
     is_candidate = models.BooleanField(default=False)
@@ -16,7 +15,13 @@ class User(AbstractUser):
     
 class Candidate(User):
     mathematics = models.IntegerField(default=0)
+    description = models.TextField(blank=True, default='Hi there! I am using Corival')
     # Rest Will be Other details like Expirence, Projects, skills resume etc.
+    
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.is_candidate = True
+    
     
     def __str__(self):
         return self.username
@@ -28,6 +33,12 @@ class Recruiter(User):
     position = models.CharField(max_length=100, blank=True)
     # Rest Will be Other details like Expirence, Projects, skills resume etc.
     
+    
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.is_recruiter = True
+        
+
     def __str__(self):
         return self.username
         

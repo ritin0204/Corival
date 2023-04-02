@@ -1,26 +1,70 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db import IntegrityError
-from django.shortcuts import render
 from django.contrib.auth import login,logout,authenticate
 from django.contrib.auth.decorators import login_required
 from rest_framework.response import Response
 from django.contrib.auth.models import User
-from django.views.generic import TemplateView
+from rest_framework.views import APIView
+from django.middleware.csrf import get_token
 from django.utils.decorators import method_decorator
-
-
+from rest_framework.permissions import IsAuthenticated
 from rest_framework import viewsets
 from .serializers import *
 from .models import *
 
-
 # Create your views here.
+   
+
+def csrf(request):
+    return JsonResponse({'csrfToken': get_token(request)})
+
+
+def current_user(request):
+    if request.user.is_authenticated:
+        serializer = UserSerializer(request.user)
+        return JsonResponse(serializer.data)
+    return JsonResponse({"error":"User not logged in"},status=400)
+
+
+@login_required
+def logout_view(request):
+    if request.method == "POST":
+        logout(request)
+        return JsonResponse({"success":"Logged out successfully"},status=200)
+    return JsonResponse({"error":"Invalid request"},status=400)
+
+
+class CSRFExemptMixin(object):
+   @method_decorator(csrf_exempt)
+   def dispatch(self, *args, **kwargs):
+       return super(CSRFExemptMixin, self).dispatch(*args, **kwargs)
+   
+
+@method_decorator(csrf_exempt, name='dispatch')
+class AuthView(CSRFExemptMixin, APIView):
+    template_name = 'frontend/index.html'
+    
+    def post(self,request):
+        print(request.POST)
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(username=username,password=password)
+        if user is not None:
+            login(request,user)
+            print(user)
+            userData = UserSerializer(instance=user,many=False)
+            return Response(userData.data,status=200)
+        else:
+            return JsonResponse({"error":"Invalid Username or password"},status=400)
+
+
 class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
+    permission_classes = [IsAuthenticated]
     
-
+    
 class CandidateViewSet(viewsets.ModelViewSet):
     serializer_class = CandidateSerializer
     queryset = Candidate.objects.all()
@@ -33,7 +77,7 @@ class RecruiterViewSet(viewsets.ModelViewSet):
     
 class ApptitudeViewSet(viewsets.ModelViewSet):
     queryset = Apptitude.objects.all()
-    serializer_class = ApptitudeSerializer
+    serializer_class = ApptitudeSerializer   
     
     
 class ContestViewSet(viewsets.ModelViewSet):
@@ -49,8 +93,8 @@ class ContestSubmissionViewSet(viewsets.ModelViewSet):
 class ContestLeaderboardViewSet(viewsets.ModelViewSet):
     queryset = ContestLeaderboard.objects.all()
     serializer_class = ContestLeaderboardSerializer
-
-
+    
+    
 class ChallengeViewSet(viewsets.ModelViewSet):
     queryset = Challenge.objects.all()
     serializer_class = ChallengeSerializer
@@ -69,84 +113,10 @@ class ChallengeLeaderboardViewSet(viewsets.ModelViewSet):
 class PracticeViewSet(viewsets.ModelViewSet):
     queryset = Practice.objects.all()
     serializer_class = PracticeSerializer
+    permission_classes = [IsAuthenticated]
     
     
 class PracticeSubmissionViewSet(viewsets.ModelViewSet):
     queryset = PracticeSubmission.objects.all()
     serializer_class = PracticeSubmissionSerializer
-
-
-class AuthView(TemplateView):
-    template_name = 'frontend/index.html'
-    
-    @method_decorator(csrf_exempt)
-    def post(self,request):
-        username = request.POST['username']
-        password = request.POST['password']
-        user = authenticate(username=username,password=password)
-        if user is not None:
-            login(request,user)
-            userData = UserSerializer(instance=user,many=False)
-            return Response(userData.data,status=200)
-        else:
-            return JsonResponse({"error":"Invalid Username or password"},status=400)
-
-
-# def csrf(request):
-#     return 
-
-def current_user(request):
-    if request.user.is_authenticated:
-        serializer = UserSerializer(request.user)
-        return JsonResponse(serializer.data)
-    return JsonResponse({"error":"User not logged in"},status=400)
-
-
-
-# @csrf_exempt
-# def register_view(request):
-#     if request.method == "POST":
-#         username = request.POST['username']
-#         email = request.POST['email']
-#         test_user = User.objects.filter(email=email).count()
-#         if test_user>0:
-#             return JsonResponse({"error":"Email Already exists"},status=400)
-#         password = request.POST['password']
-#         firstName = request.POST['firstName']
-#         lastName = request.POST['lastName']
-#         is_mg = request.POST['purpose']
-#         try:
-#             user = User.objects.create_user(username,email,password)
-#             user.first_name = firstName
-#             user.last_name = lastName
-#             user.is_manager = is_mg
-#             print(user)
-#             # user.save()
-#         except IntegrityError:
-#             user = User.objects.get(username=username)
-#             return JsonResponse({"error":"Username already exists"},status=400)
-#         else:
-#             login(request,user)
-#             return JsonResponse({"success":"Registered successfully"},status=200)
-#     return render(request,'frontend/index.html')
-
-# @login_required
-# def logout_view(request):
-#     if request.method == "POST":
-#         logout(request)
-#         return JsonResponse({"success":"Logged out successfully"},status=200)
-#     return JsonResponse({"error":"Invalid request"},status=400)
-
-# @csrf_exempt
-# @api_view(['GET','POST'])
-# def add_questions(request):
-#     if request.method=="POST":
-#         serializer = QuestionsSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=201)
-#     elif request.method == "GET":
-#         return Response(QuestionsSerializer(Questions.objects.all(),many=True).data)
-#     else:
-#         return render(request,"corival/error.html",{"error":"400 : Invalid request"})
-    
+    permission_classes = [IsAuthenticated]
