@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import MinValueValidator, MaxValueValidator
 import datetime
 
 # Create your models here.
@@ -9,6 +10,11 @@ class User(AbstractUser):
     is_recruiter = models.BooleanField(default=False)
     is_candidate = models.BooleanField(default=False)
     
+    
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self.username = self.username.lower()
+        
     def __str__(self):
         return self.pk
     
@@ -20,7 +26,10 @@ class Candidate(User):
     
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
+        # Instead of defining them in serrializers i am defining them here
         self.is_candidate = True
+        if self.description == '':
+            self.description = 'Hi there! I am using Corival'
     
     
     def __str__(self):
@@ -63,11 +72,17 @@ APPTITUDE_CHOICES = (
     ['Miscellaneous', 'Miscellaneous']
 )
     
-    
+DIFFICULTY_CHOICES = (
+    [1, 'Easy'],
+    [2, 'Medium'],
+    [3, 'Hard']
+)
+
 class Apptitude(models.Model):
-    question = models.TextField()
+    question = models.TextField(unique=True)
+    answer_position = models.IntegerField("answer_position", validators=[MinValueValidator(1), MaxValueValidator(4)], default=1)
     category = models.CharField(max_length=100, choices=APPTITUDE_CHOICES, default=APPTITUDE_CHOICES[0][0])
-    difficulty = models.IntegerField(default=1)
+    difficulty = models.IntegerField(default=1, choices=DIFFICULTY_CHOICES)
     added_by = models.ForeignKey("User", related_name="choices", on_delete=models.CASCADE, default=1)
     
     def __str__(self):
@@ -76,9 +91,8 @@ class Apptitude(models.Model):
 
 class Choice(models.Model):
     question = models.ForeignKey("Apptitude", related_name="choices", on_delete=models.CASCADE)
-    choice = models.CharField("Choice", max_length=50)
-    position = models.IntegerField("position")
-    answer_position = models.IntegerField("answer_position")
+    choice = models.CharField("Choice", max_length=100)
+    position = models.IntegerField("position", validators=[MinValueValidator(1), MaxValueValidator(4)], default=1)
     
     class Meta:
         unique_together = [
@@ -96,7 +110,7 @@ class Contest(models.Model):
     end_time = models.DateTimeField()
     description = models.TextField()
     category = models.CharField(max_length=100, choices=APPTITUDE_CHOICES, default=APPTITUDE_CHOICES[0][0])
-    difficulty = models.IntegerField(default=1)
+    difficulty = models.IntegerField(default=1, choices=DIFFICULTY_CHOICES)
     questions = models.ManyToManyField(Apptitude)
     created_by = models.ForeignKey("User", related_name="contests", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -134,7 +148,7 @@ class Challenge(models.Model):
     reciever = models.ForeignKey("Candidate", related_name="challenges_recieved", on_delete=models.CASCADE)
     
     note = models.TextField(default="No Note")
-    difficulty = models.IntegerField(default=1)
+    difficulty = models.IntegerField(default=1, choices=DIFFICULTY_CHOICES)
     category = models.CharField(max_length=100, choices=APPTITUDE_CHOICES, default=APPTITUDE_CHOICES[0][0])
     questions = models.ManyToManyField(Apptitude)
     start_time = models.DateTimeField(auto_now_add=True)
@@ -166,7 +180,7 @@ class ChallengeLeaderboard(models.Model):
         
 class Practice(models.Model):
     created_by = models.ForeignKey("User", related_name="practice", on_delete=models.CASCADE, default=1)
-    difficulty = models.IntegerField(default=1)
+    difficulty = models.IntegerField(default=1, choices=DIFFICULTY_CHOICES)
     category = models.CharField(max_length=100, choices=APPTITUDE_CHOICES, default=APPTITUDE_CHOICES[0][0])
     questions = models.ManyToManyField(Apptitude)
     start_time = models.DateTimeField(auto_now_add=True)

@@ -11,28 +11,107 @@ class UserSerializer(serializers.ModelSerializer):
 class CandidateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Candidate
-        fields = '__all__'
+        fields = [
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'password',
+            'date_joined',
+            'last_login',
+            'description',
+            'mathematics',
+            'phone',
+            'is_recruiter',
+            'is_candidate'
+        ]
+        read_only_fields = ['date_joined', 'last_login', 'is_recruiter', 'is_candidate', 'mathematics']
+        write_only_fields = ['password']
+        
+    def create(self, validated_data):
+        password = validated_data.pop('password')
+        candidate = Candidate(**validated_data)
+        candidate.set_password(password)
+        candidate.save()
+        return candidate
         
         
 class RecruiterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Recruiter
-        fields = '__all__'
+        fields = [
+            'username',
+            'email',
+            'password',
+            'first_name',
+            'last_name',
+            'date_joined',
+            'last_login',
+            'phone',
+            'company',
+            'verified',
+            'position',
+            'is_recruiter',
+            'is_candidate'
+        ]
+        read_only_fields = ['date_joined', 'last_login', 'is_recruiter', 'is_candidate']
+        write_only_fields = ['password']
+    
+    def create(self, validated_data):
+        password = validated_data.pop('password')
+        recruiter = Recruiter(**validated_data)
+        recruiter.set_password(password)
+        recruiter.save()
+        return recruiter
 
         
 class ChoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Choice
-        fields = ('question', 'choice', 'position', 'answer_position')
+        fields = ('question', 'choice', 'position')
         
 
 class ApptitudeSerializer(serializers.ModelSerializer):
     choices = ChoiceSerializer(many=True, read_only=True)
+    choice1 = serializers.CharField(max_length=100, write_only=True)
+    choice2 = serializers.CharField(max_length=100, write_only=True)
+    choice3 = serializers.CharField(max_length=100, write_only=True)
+    choice4 = serializers.CharField(max_length=100, write_only=True)
+    
     class Meta:
         model = Apptitude
-        fields = ('id', 'question', 'choices', 'category', 'difficulty','added_by')
-            
+        fields = (
+            'id', 
+            'question', 
+            'choices',
+            'choice1',
+            'choice2',
+            'choice3',
+            'choice4',
+            'answer_position',
+            'category', 
+            'difficulty',
+            'added_by'
+        )
+        read_only_fields = ['choices']
+    
+    def create(self, validated_data):
+        choices = [
+            validated_data.pop('choice1'),
+            validated_data.pop('choice2'),
+            validated_data.pop('choice3'),
+            validated_data.pop('choice4'),
+        ]
+        apptitude = Apptitude.objects.create(**validated_data)
+        for i, choice in enumerate(choices):
+            Choice.objects.create(
+                question=apptitude,
+                choice=choice,
+                position=i+1
+            )
+        return apptitude
         
+
 class ContestSerializer(serializers.ModelSerializer):
     apptitude = ApptitudeSerializer(many=True, read_only=True)
     class Meta:
@@ -50,7 +129,8 @@ class ContestLeaderboardSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContestLeaderboard
         fields = '__all__'
-        
+
+
 class ChallengeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Challenge

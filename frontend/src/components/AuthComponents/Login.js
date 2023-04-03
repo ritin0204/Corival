@@ -10,7 +10,7 @@ import {
     Col,
     UncontrolledAlert,
 } from 'reactstrap';
-import fetchRequest, { getCsrfToken } from "../requests";
+import fetchRequest, { getCsrfToken } from "../../requests";
 import { useState } from 'react';
 
 

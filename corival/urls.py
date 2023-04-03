@@ -12,6 +12,7 @@ routes.register('recruiters',RecruiterViewSet, basename='recruiter')
 
 # Apptitude Routes
 routes.register('apptitudes',ApptitudeViewSet, basename='apptitude')
+routes.register('choices',ChoiceViewSet, basename='choice')
 
 # Contest Routes
 routes.register('contests',ContestViewSet, basename='contest')

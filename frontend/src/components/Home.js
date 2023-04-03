@@ -10,7 +10,7 @@ import {
     Container,
     CardHeader
 } from 'reactstrap';
-import { Link, useNavigate} from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import fetchRequest, { getCurrentUser, setCurrentUser } from '../requests';
 
 
@@ -41,26 +41,29 @@ const Sections = (props) => {
     const navigate = useNavigate();
     const logOut = () => {
         fetchRequest('/logout', 'post')
-        .then(response => {
-            setCurrentUser(null);
-            window.location.reload();
-            // navigate('/');
-        })
-        .catch(error => {
-            console.log(error);
-        });
+            .then(response => {
+                setCurrentUser(null);
+                window.location.reload();
+                // navigate('/');
+            })
+            .catch(error => {
+                console.log(error);
+            });
     }
 
 
     return (
         <div>
             <Card className="my-4 mx-8" color="secondary" outline>
-                <Button size='sm' color="secondary" className="float-right my-2 mx-2" style={{width:100}} onClick={logOut}>Logout</Button>
+                <Button size='sm' color="secondary" className="float-right my-2 mx-2" style={{ width: 100 }} onClick={logOut}>Logout</Button>
                 <CardBody className='card-text'>
                     <CardTitle tag="h1" className='text-success'>Welcome {props.user.username}!</CardTitle>
                     <CardText>
                         {props.user.description}
                     </CardText>
+                    <Link to={'/profile'}>
+                        <Button size="sm" color="primary">View Profile</Button>
+                    </Link>
                 </CardBody>
             </Card>
             <Row>
@@ -145,7 +148,7 @@ const Intro = () => {
                     </Card>
                 </Col>
                 <Col sm="6">
-                <Card className="my-2" color="secondary" outline>
+                    <Card className="my-2" color="secondary" outline>
                         <CardBody>
                             <CardText>
                                 You are here for...
@@ -161,27 +164,32 @@ const Intro = () => {
                     </Card>
                 </Col>
             </Row>
-        <Card className="my-4 mx-8" color="secondary" outline>
-            <CardBody className='card-text'>
-                <CardTitle tag="h1" className='text-success'>Welcome to Corival!</CardTitle>
-                <CardText>
-                    Looking for a fun and engaging way to practice your aptitude skills and challenge your friends? You've come to the right place!
-                </CardText>
-                <CardText>
-                    Our competitions and challenges cover a wide range of topics, from math and logic puzzles to language and comprehension exercises. Each challenge is carefully designed to test your skills and push you to your limits, while also being fun and engaging.
-                </CardText>
-                <CardText>
-                    At Corival, we offer a variety of competitions and challenges designed to help you improve your aptitude skills and have fun at the same time. Whether you're a student preparing for an exam, a job seeker looking to impress potential employers, or just someone who enjoys a good challenge, we've got something for you.
-                </CardText>
-                <CardText>
-                    But that's not all - we also offer the ability to challenge your friends and see how you stack up against them. Simply invite them to join you on Corival, choose a challenge, and see who comes out on top. It's a great way to stay motivated and keep improving your skills.
-                </CardText>
-                <CardText>
-                    So what are you waiting for? <Link to={'/register'}>Register</Link> for Corival today and start practicing your aptitude skills in a fun and challenging way. We can't wait to see what you can do!
-                    <br></br>Alredy have an account? <Link to={'/login'}>Login Here</Link>.
-                </CardText>
-            </CardBody>
-        </Card>
+            <Card className="my-2" color="secondary" outline>
+                <CardBody>
+                    <CardText className='text-center'>
+                        Alredy have an account? <Link to={'/login'}>
+                            Login Here
+                        </Link>.
+                    </CardText>
+                </CardBody>
+            </Card>
+            <Card className="my-4 mx-8" color="secondary" outline>
+                <CardBody className='card-text'>
+                    <CardTitle tag="h1" className='text-success'>Welcome to Corival!</CardTitle>
+                    <CardText>
+                        Looking for a fun and engaging way to practice your aptitude skills and challenge your friends? You've come to the right place!
+                    </CardText>
+                    <CardText>
+                        Our competitions and challenges cover a wide range of topics, from math and logic puzzles to language and comprehension exercises. Each challenge is carefully designed to test your skills and push you to your limits, while also being fun and engaging.
+                    </CardText>
+                    <CardText>
+                        At Corival, we offer a variety of competitions and challenges designed to help you improve your aptitude skills and have fun at the same time. Whether you're a student preparing for an exam, a job seeker looking to impress potential employers, or just someone who enjoys a good challenge, we've got something for you.
+                    </CardText>
+                    <CardText>
+                        But that's not all - we also offer the ability to challenge your friends and see how you stack up against them. Simply invite them to join you on Corival, choose a challenge, and see who comes out on top. It's a great way to stay motivated and keep improving your skills.
+                    </CardText>
+                </CardBody>
+            </Card>
         </Container>
     );
 }

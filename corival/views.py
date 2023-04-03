@@ -8,13 +8,22 @@ from django.contrib.auth.models import User
 from rest_framework.views import APIView
 from django.middleware.csrf import get_token
 from django.utils.decorators import method_decorator
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import viewsets
 from .serializers import *
 from .models import *
 
 # Create your views here.
-   
+
+# I am turning this of so i can deveop the frontend without having to login everytime
+class PermissionMixin(object):
+    def get_permissions(self):
+        if self.action == 'create':
+            permission_classes = [AllowAny]
+        else:
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
+    
 
 def csrf(request):
     return JsonResponse({'csrfToken': get_token(request)})
@@ -22,7 +31,14 @@ def csrf(request):
 
 def current_user(request):
     if request.user.is_authenticated:
-        serializer = UserSerializer(request.user)
+        print(request.user.is_recruiter)
+        print(request.user.is_candidate)
+        if request.user.is_candidate:
+            user = Candidate.objects.get(username=request.user.username)
+            serializer = CandidateSerializer(user,many=False)
+            print(serializer.data)
+            return JsonResponse(serializer.data)
+        serializer = UserSerializer(request.user,many=False)
         return JsonResponse(serializer.data)
     return JsonResponse({"error":"User not logged in"},status=400)
 
@@ -33,26 +49,18 @@ def logout_view(request):
         logout(request)
         return JsonResponse({"success":"Logged out successfully"},status=200)
     return JsonResponse({"error":"Invalid request"},status=400)
-
-
-class CSRFExemptMixin(object):
-   @method_decorator(csrf_exempt)
-   def dispatch(self, *args, **kwargs):
-       return super(CSRFExemptMixin, self).dispatch(*args, **kwargs)
    
 
 @method_decorator(csrf_exempt, name='dispatch')
-class AuthView(CSRFExemptMixin, APIView):
+class AuthView(APIView):
     template_name = 'frontend/index.html'
     
     def post(self,request):
-        print(request.POST)
         username = request.POST['username']
         password = request.POST['password']
         user = authenticate(username=username,password=password)
         if user is not None:
             login(request,user)
-            print(user)
             userData = UserSerializer(instance=user,many=False)
             return Response(userData.data,status=200)
         else:
@@ -62,24 +70,40 @@ class AuthView(CSRFExemptMixin, APIView):
 class UserViewSet(viewsets.ModelViewSet):
     serializer_class = UserSerializer
     queryset = User.objects.all()
-    permission_classes = [IsAuthenticated]
-    
-    
+
+
 class CandidateViewSet(viewsets.ModelViewSet):
     serializer_class = CandidateSerializer
     queryset = Candidate.objects.all()
     
+    def create(self, request, *args, **kwargs):
+        response =  super().create(request, *args, **kwargs)
+        if response.status_code == 201:
+            login(request,User.objects.get(username=request.data['username']))
+        return response
+        
     
 class RecruiterViewSet(viewsets.ModelViewSet):
     serializer_class = RecruiterSerializer
     queryset = Recruiter.objects.all()
     
+    def create(self, request, *args, **kwargs):
+        response =  super().create(request, *args, **kwargs)
+        if response.status_code == 201:
+            login(request,User.objects.get(username=request.data['username']))
+        return response
     
+
 class ApptitudeViewSet(viewsets.ModelViewSet):
     queryset = Apptitude.objects.all()
-    serializer_class = ApptitudeSerializer   
+    serializer_class = ApptitudeSerializer
     
     
+class ChoiceViewSet(viewsets.ModelViewSet):
+    queryset = Choice.objects.all()
+    serializer_class = ChoiceSerializer
+    
+
 class ContestViewSet(viewsets.ModelViewSet):
     queryset = Contest.objects.all()
     serializer_class = ContestSerializer

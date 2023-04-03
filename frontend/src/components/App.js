@@ -1,8 +1,10 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Header from './Header';
 import Home from './Home';
-import Login from './Login';
-import {RecruiterSignup, CandidateSignup} from './Signup';
+import Login from './AuthComponents/Login';
+import CandidateSignup from './AuthComponents/CandidateSignup';
+import RecruiterSignup from './AuthComponents/RecruiterSignup';
+import CandidateProfile from './Profile/CandidateProfile';
 import { Container } from 'reactstrap';
 
 
@@ -14,7 +16,6 @@ const NotFound = () => {
     </div>
   );
 };
-
 
 const Competitions = () => {
   return (
@@ -33,6 +34,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/profile" element={<CandidateProfile/>} />
             <Route path="/candidates/register" element={<CandidateSignup />} />
             <Route path="/recruiters/register" element={<RecruiterSignup />} />
             <Route path="/compete" element={<Competitions/>} />
