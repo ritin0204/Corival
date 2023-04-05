@@ -7,12 +7,20 @@ import {
     CardTitle,
     Button,
     CardText,
-    Container,
-    CardHeader
+    Container
 } from 'reactstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import fetchRequest, { getCurrentUser, setCurrentUser } from '../requests';
+import Logout from './AuthComponents/Logout';
 
+
+const RecruiterSections = (props) => {
+    return (
+        <div>
+            <h1>RecruiterSections</h1>
+        </div>
+    );
+}
 
 const Home = () => {
     const [user, setUser] = useState(null);
@@ -25,7 +33,19 @@ const Home = () => {
     if (user) {
         return (
             <Container className='home'>
-                <Sections user={user} />
+                <Card className="my-4 mx-8" color="secondary" outline>
+                    <CardBody className='card-text'>
+                        <CardTitle tag="h1" className='text-success'>Welcome {user.username}!</CardTitle>
+                        <CardText>
+                            {user.description}
+                        </CardText>
+                        <Link to={'/profile'} state={user}>
+                            <Button size="sm" color="primary">View Profile</Button>
+                        </Link>
+                        <Logout className="float-right my-2 mx-2" />
+                    </CardBody>
+                </Card>
+                {user.is_recruiter ? <RecruiterSections /> : <Sections user={user} />}
             </Container>
         );
     }
@@ -38,90 +58,52 @@ const Home = () => {
 
 
 const Sections = (props) => {
-    const navigate = useNavigate();
-    const logOut = () => {
-        fetchRequest('/logout', 'post')
-            .then(response => {
-                setCurrentUser(null);
-                window.location.reload();
-                // navigate('/');
-            })
-            .catch(error => {
-                console.log(error);
-            });
-    }
-
-
     return (
         <div>
-            <Card className="my-4 mx-8" color="secondary" outline>
-                <Button size='sm' color="secondary" className="float-right my-2 mx-2" style={{ width: 100 }} onClick={logOut}>Logout</Button>
-                <CardBody className='card-text'>
-                    <CardTitle tag="h1" className='text-success'>Welcome {props.user.username}!</CardTitle>
+            <Card className="my-2" color="primary" outline>
+                <CardBody>
+                    <CardTitle tag="h5">Compete</CardTitle>
                     <CardText>
-                        {props.user.description}
+                        Compete with your friends to see who can get the most points.
                     </CardText>
-                    <Link to={'/profile'}>
-                        <Button size="sm" color="primary">View Profile</Button>
+                    <Link to={'/compete'}>
+                        <Button size="sm" color="primary">Compete</Button>
                     </Link>
                 </CardBody>
             </Card>
-            <Row>
-                <Col sm="6">
-                    <Card className="my-2" color="primary" outline>
-                        <CardBody>
-                            <CardTitle tag="h5">Compete</CardTitle>
-                            <CardText>
-                                Compete with your friends to see who can get the most points.
-                            </CardText>
-                            <Link to={'/compete'}>
-                                <Button size="sm" color="primary">Compete</Button>
-                            </Link>
-                        </CardBody>
-                    </Card>
-                </Col>
-                <Col sm="6">
-                    <Card className="my-2" color="primary" outline>
-                        <CardBody>
-                            <CardTitle tag="h5">Practice</CardTitle>
-                            <CardText>
-                                Practice your skills with our practice mode.
-                            </CardText>
-                            <Link to={'/practice'}>
-                                <Button size="sm" color="primary">Practice</Button>
-                            </Link>
-                        </CardBody>
-                    </Card>
-                </Col>
-            </Row>
-            <Row>
-                <Col sm="6">
-                    <Card className="my-2" color="primary" outline>
-                        <CardBody>
-                            <CardTitle tag="h5">Challenge</CardTitle>
-                            <CardText>
-                                Challenge your friends to a game of chess.
-                            </CardText>
-                            <Link to={'/challenge'}>
-                                <Button size="sm" color="primary">Challenge</Button>
-                            </Link>
-                        </CardBody>
-                    </Card>
-                </Col>
-                <Col sm="6">
-                    <Card className="my-2" color="primary" outline>
-                        <CardBody>
-                            <CardTitle tag="h5">Learn</CardTitle>
-                            <CardText>
-                                Learn concepts and techniques with our tutorial.
-                            </CardText>
-                            <Link to={'/learn'}>
-                                <Button size="sm" color="primary">Learn</Button>
-                            </Link>
-                        </CardBody>
-                    </Card>
-                </Col>
-            </Row>
+            <Card className="my-2" color="primary" outline>
+                <CardBody>
+                    <CardTitle tag="h5">Practice</CardTitle>
+                    <CardText>
+                        Practice your skills with our practice mode.
+                    </CardText>
+                    <Link to={'/practice'}>
+                        <Button size="sm" color="primary">Practice</Button>
+                    </Link>
+                </CardBody>
+            </Card>
+            <Card className="my-2" color="primary" outline>
+                <CardBody>
+                    <CardTitle tag="h5">Challenge</CardTitle>
+                    <CardText>
+                        Challenge your friends to a game of chess.
+                    </CardText>
+                    <Link to={'/challenge'}>
+                        <Button size="sm" color="primary">Challenge</Button>
+                    </Link>
+                </CardBody>
+            </Card>
+            <Card className="my-2" color="primary" outline>
+                <CardBody>
+                    <CardTitle tag="h5">Learn</CardTitle>
+                    <CardText>
+                        Learn concepts and techniques with our tutorial.
+                    </CardText>
+                    <Link to={'/learn'}>
+                        <Button size="sm" color="primary">Learn</Button>
+                    </Link>
+                </CardBody>
+            </Card>
         </div>
     );
 }

@@ -1,0 +1,100 @@
+[
+    {
+        "id": 2,
+        "questions": [
+            {
+                "id": 10,
+                "question": "If the number 653ab is divisible by 90, then (a + b) =?",
+                "choices": [
+                    {
+                        "question": 10,
+                        "choice": "2",
+                        "position": 1
+                    },
+                    {
+                        "question": 10,
+                        "choice": "3",
+                        "position": 2
+                    },
+                    {
+                        "question": 10,
+                        "choice": "4",
+                        "position": 3
+                    },
+                    {
+                        "question": 10,
+                        "choice": "6",
+                        "position": 4
+                    }
+                ],
+                "category": "Number System",
+                "difficulty": 1,
+                "added_by": "makima"
+            },
+            {
+                "id": 11,
+                "question": "A number when multiplied by 16 increases by 540. What is the number?",
+                "choices": [
+                    {
+                        "question": 11,
+                        "choice": "30",
+                        "position": 1
+                    },
+                    {
+                        "question": 11,
+                        "choice": "36",
+                        "position": 2
+                    },
+                    {
+                        "question": 11,
+                        "choice": "42",
+                        "position": 3
+                    },
+                    {
+                        "question": 11,
+                        "choice": "46",
+                        "position": 4
+                    }
+                ],
+                "category": "Number System",
+                "difficulty": 1,
+                "added_by": "makima"
+            },
+            {
+                "id": 13,
+                "question": "What is the number in the unit place in (729)59?",
+                "choices": [
+                    {
+                        "question": 13,
+                        "choice": "9",
+                        "position": 1
+                    },
+                    {
+                        "question": 13,
+                        "choice": "1",
+                        "position": 2
+                    },
+                    {
+                        "question": 13,
+                        "choice": "6",
+                        "position": 3
+                    },
+                    {
+                        "question": 13,
+                        "choice": "7",
+                        "position": 4
+                    }
+                ],
+                "category": "Number System",
+                "difficulty": 1,
+                "added_by": "makima"
+            }
+        ],
+        "category": "Number System",
+        "difficulty": 1,
+        "created_by": "ritin0203",
+        "start_time": "2023-04-05T21:13:14.965524+05:30",
+        "end_time": "2023-04-05T21:15:49.963033+05:30",
+        "score": 0
+    }
+]

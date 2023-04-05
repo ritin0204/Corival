@@ -189,7 +189,7 @@ class Practice(models.Model):
     
     
     def __str__(self):
-        return self.user.username
+        return self.created_by.username
         
         
 class PracticeSubmission(models.Model):

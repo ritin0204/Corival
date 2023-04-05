@@ -4,8 +4,9 @@ import Home from './Home';
 import Login from './AuthComponents/Login';
 import CandidateSignup from './AuthComponents/CandidateSignup';
 import RecruiterSignup from './AuthComponents/RecruiterSignup';
-import CandidateProfile from './Profile/CandidateProfile';
+import Profile from './Profile/Profile';
 import { Container } from 'reactstrap';
+import PracticePage from './PracticeComponent/Practice';
 
 
 const NotFound = () => {
@@ -16,6 +17,7 @@ const NotFound = () => {
     </div>
   );
 };
+
 
 const Competitions = () => {
   return (
@@ -34,10 +36,10 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/login" element={<Login />} />
-            <Route path="/profile" element={<CandidateProfile/>} />
+            <Route path="/profile" element={<Profile/>} />
             <Route path="/candidates/register" element={<CandidateSignup />} />
             <Route path="/recruiters/register" element={<RecruiterSignup />} />
-            <Route path="/compete" element={<Competitions/>} />
+            <Route path="/practice" element={<PracticePage/>} />
             <Route path="/*" element={<NotFound />} />
           </Routes>
         </Container>

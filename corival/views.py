@@ -31,12 +31,13 @@ def csrf(request):
 
 def current_user(request):
     if request.user.is_authenticated:
-        print(request.user.is_recruiter)
-        print(request.user.is_candidate)
         if request.user.is_candidate:
             user = Candidate.objects.get(username=request.user.username)
             serializer = CandidateSerializer(user,many=False)
-            print(serializer.data)
+            return JsonResponse(serializer.data)
+        elif request.user.is_recruiter:
+            user = Recruiter.objects.get(username=request.user.username)
+            serializer = RecruiterSerializer(user,many=False)
             return JsonResponse(serializer.data)
         serializer = UserSerializer(request.user,many=False)
         return JsonResponse(serializer.data)

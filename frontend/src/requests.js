@@ -30,7 +30,7 @@ export function setCurrentUser(user) {
 }
 
 export const getCurrentUser = async () => {
-    if (currentUser) {
+    if (currentUser !== null && currentUser !== undefined && currentUser !== {}) {
         return currentUser;
     }
     else {
