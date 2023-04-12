@@ -7,6 +7,8 @@ import RecruiterSignup from './AuthComponents/RecruiterSignup';
 import Profile from './Profile/Profile';
 import { Container } from 'reactstrap';
 import PracticePage from './PracticeComponent/Practice';
+import PracticeDetails from './PracticeComponent/PracticeDetails';
+import PracticeQuiz from './quiz/PracticeQuiz';
 
 
 const NotFound = () => {
@@ -40,6 +42,9 @@ function App() {
             <Route path="/candidates/register" element={<CandidateSignup />} />
             <Route path="/recruiters/register" element={<RecruiterSignup />} />
             <Route path="/practice" element={<PracticePage/>} />
+            <Route path="/practice/:id" element={<PracticeDetails/>} />
+            <Route path="/practice/quiz" element={<PracticeQuiz/>} />
+            <Route path="/competitions" element={<Competitions />} />
             <Route path="/*" element={<NotFound />} />
           </Routes>
         </Container>

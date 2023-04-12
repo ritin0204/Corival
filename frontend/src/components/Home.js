@@ -9,8 +9,8 @@ import {
     CardText,
     Container
 } from 'reactstrap';
-import { Link, useNavigate } from 'react-router-dom';
-import fetchRequest, { getCurrentUser, setCurrentUser } from '../requests';
+import { Link } from 'react-router-dom';
+import { getCurrentUser } from '../requests';
 import Logout from './AuthComponents/Logout';
 
 

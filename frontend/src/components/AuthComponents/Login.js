@@ -26,16 +26,15 @@ export default function Login() {
         }
         data.append('csrfmiddlewaretoken', getCsrfToken());
         fetchRequest(`/${path}`, 'post', data)
-            .then(response => {
-                if (response.status === 200) {
-                    navigate('/');
-                }
-            })
-            .catch(error => {
-                console.log(error)
-                document.getElementById('submission-alert').innerHTML = error.response.data.error;
-                document.getElementById('submission-alert').classList.remove('d-none');
-            });
+        .then(response => {
+            if (response.status === 200) {
+                navigate('/');
+            }
+        })
+        .catch(error => {
+            document.getElementById('submission-alert').innerHTML = error.response.data.error;
+            document.getElementById('submission-alert').classList.remove('d-none');
+        });
     }
 
 

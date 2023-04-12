@@ -12,7 +12,9 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import viewsets
 from .serializers import *
 from .models import *
+import datetime, pytz
 
+utc=pytz.UTC
 # Create your views here.
 
 # I am turning this of so i can deveop the frontend without having to login everytime
@@ -145,3 +147,10 @@ class PracticeSubmissionViewSet(viewsets.ModelViewSet):
     queryset = PracticeSubmission.objects.all()
     serializer_class = PracticeSubmissionSerializer
     permission_classes = [IsAuthenticated]
+    
+    def create(self, request, *args, **kwargs):
+        practice = Practice.objects.get(id=request.data['practice'])
+        if practice.end_time < utc.localize(datetime.datetime.utcnow()):
+            return JsonResponse({"error":"Practice has ended"},status=400)
+        response = super().create(request, *args, **kwargs)
+        return response

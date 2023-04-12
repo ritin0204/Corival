@@ -189,16 +189,21 @@ class Practice(models.Model):
     
     
     def __str__(self):
-        return self.created_by.username
+        return str(self.id)
         
         
 class PracticeSubmission(models.Model):
     practice = models.ForeignKey("Practice", related_name="submissions", on_delete=models.CASCADE, default=1)
     user = models.ForeignKey("User", related_name="practice_submissions", on_delete=models.CASCADE, default=1)
     apptitude = models.ForeignKey("Apptitude", related_name="practice_submissions", on_delete=models.CASCADE, default=1)
-    timm_took = models.TimeField()
+    user_choice = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)], default=1)
+    time_taken = models.DurationField()
     answer = models.BooleanField(default=False)
     
+    class Meta:
+        unique_together = [
+            ("practice", "user", "apptitude")
+        ]
     
     def __str__(self):
         return self.practice.id

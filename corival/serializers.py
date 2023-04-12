@@ -2,7 +2,6 @@ from rest_framework import serializers
 from .models import *
 import random, datetime
 
-
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -189,11 +188,20 @@ class PracticeSerializer(serializers.ModelSerializer):
         practice  = Practice.objects.create(**validated_data)
         practice.questions.set(apptitude)
         return practice
-        
+
+
 
 class PracticeSubmissionSerializer(serializers.ModelSerializer):
     class Meta:
         model = PracticeSubmission
-        fields = '__all__'
+        fields = ['id', 'practice', 'user', 'answer', 'time_taken', 'user_choice', 'apptitude']
+        read_only_fields = ['user', 'answer']
         
         
+    def create(self, validated_data):
+        validated_data['user'] = self.context['request'].user
+        if validated_data['user_choice'] == validated_data['apptitude'].answer_position:
+            validated_data['answer'] = True
+        practice_submission = PracticeSubmission.objects.create(**validated_data)
+        return practice_submission
+    

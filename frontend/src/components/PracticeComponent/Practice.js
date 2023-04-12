@@ -1,4 +1,3 @@
-import practices from './practice.json';
 import {
     Container,
     Row,
@@ -13,19 +12,55 @@ import {
     ListGroup,
     ListGroupItem,
     FormGroup,
+    UncontrolledAlert,
 }
     from 'reactstrap';
+import { useState } from 'react';
+import { getCsrfToken, fetchRequest } from '../../requests';
+import CountDown from '../UtilsComponents/CountDown';
+import { Link } from 'react-router-dom';
 
+const CreatePractice = ({setRedirect}) => {
+    const [formData, setFormData] = useState({
+        category: "All",
+        difficulty: 1,
+    });
 
-const CreatePractice = () => {
+    function handleSubmit(event, path, formData) {
+        event.preventDefault();
+        let data = new FormData();
+        for (let key in formData) {
+            data.append(key, formData[key]);
+        }
+        fetchRequest(`/${path}`, 'post', data)
+        .then(response => {
+            if (response.status === 201) {
+                setRedirect(true);
+            }
+        })
+        .catch(error => {
+            document.getElementById('submission-alert').innerHTML = error.response.data.detail;
+            document.getElementById('submission-alert').classList.remove('d-none');
+        });
+    }
+
+    
+    const handleChange = (event) => {
+        setFormData((formData) => ({
+            ...formData,
+            [event.target.name]: event.target.value,
+        }));
+    };
+
     return (
         <Card color="success" outline>
             <CardBody>
                 <CardTitle>Create Practice</CardTitle>
-                <Form>
+                <UncontrolledAlert id='submission-alert' color="danger" className='p-2 d-none'></UncontrolledAlert>
+                <Form onSubmit={(e) => { handleSubmit(e, "api/practice/", formData) }}>
                     <FormGroup>
                         <label>Category</label>
-                        <Input bsSize="sm" className="mb-3" type="select">
+                        <Input bsSize="sm" className="mb-3" name="category" type="select"  onChange={handleChange}>
                             <option value="All">All</option>
                             <option value="Profit and Loss">Profit and Loss</option>
                             <option value="Time and Work">Time and Work</option>
@@ -46,7 +81,7 @@ const CreatePractice = () => {
                     </FormGroup>
                     <FormGroup>
                         <label>Difficulty</label>
-                        <Input bsSize="sm" className="mb-3" type="select">
+                        <Input bsSize="sm" className="mb-3" name='difficulty' onChange={handleChange} type="select">
                             <option value="1">Easy</option>
                             <option value="2">Medium</option>
                             <option value="3">Hard</option>
@@ -63,20 +98,35 @@ const CreatePractice = () => {
 const PracticeItem = ({ practice
 }) => {
     return (
-        <Card color="primary" outline >
+        <Card color="primary" className='my-2' outline>
             <CardBody>
                 <CardTitle>Practice Id: {practice.id}</CardTitle>
                 <ListGroup >
                     <ListGroupItem>Category: {practice.category}</ListGroupItem>
                     <ListGroupItem>Difficulty: {practice.difficulty}</ListGroupItem>
                 </ListGroup>
-                <Button size='sm' className="my-2 float-end" color="primary">View Details</Button>
+                <Link to={`/practice/${practice.id}/`}>
+                    <Button size='sm' className="my-2 float-end" color="primary">View Details</Button>
+                </Link>
             </CardBody>
         </Card>
     );
 };
 
 const PracticeList = () => {
+    const [practices, setPractices] = useState([]);
+    const [loading, setLoading] = useState(true);
+    fetchRequest('/api/practice/', 'get')
+        .then(response => {
+            setPractices(response.data);
+            setLoading(false);
+        })
+        .catch(error => {
+            console.log(error);
+        });
+    if (loading) {
+        return <div>Loading...</div>;
+    }
     return (
         <CardDeck>
             <h2>Practice List</h2>
@@ -89,6 +139,10 @@ const PracticeList = () => {
 };
 
 const PracticePage = () => {
+    const [redirect, setRedirect] = useState(false);
+    if (redirect) {
+        return <CountDown time={10}/>
+    }
     return (
         // There will be 6 types of view in practice page
         // 1. All completed Practices List
@@ -97,13 +151,13 @@ const PracticePage = () => {
         // 4. Quiz Page
         // 5. Practice submission Page
         // 6. Practice Result Page
-        <Container className='my-4' color='secondary' style={{fontSize: "18px"}} outline>
+        <Container className='my-4' color='secondary' style={{fontSize: "18px"}}>
             <Row>
                 <Col md="6">
                     <PracticeList />
                 </Col>
                 <Col md="4">
-                    <CreatePractice />
+                    <CreatePractice setRedirect={setRedirect}/>
                 </Col>
             </Row>
         </Container>
