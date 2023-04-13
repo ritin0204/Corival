@@ -154,3 +154,14 @@ class PracticeSubmissionViewSet(viewsets.ModelViewSet):
             return JsonResponse({"error":"Practice has ended"},status=400)
         response = super().create(request, *args, **kwargs)
         return response
+    
+    def update(self, request, *args, **kwargs):
+        return JsonResponse({"error":"You cannot update a submission"},status=400)
+    
+    def get_queryset(self):
+        print("get_queryset called")
+        return PracticeSubmission.objects.filter(user=self.request.user)
+    
+    def get(self, request, *args, **kwargs):
+        print("get method called")
+        return self.retrieve(request, *args, **kwargs)

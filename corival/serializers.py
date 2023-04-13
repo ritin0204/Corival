@@ -200,6 +200,7 @@ class PracticeSubmissionSerializer(serializers.ModelSerializer):
         
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user
+        
         if validated_data['user_choice'] == validated_data['apptitude'].answer_position:
             validated_data['answer'] = True
         practice_submission = PracticeSubmission.objects.create(**validated_data)

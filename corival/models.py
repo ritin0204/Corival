@@ -196,7 +196,7 @@ class PracticeSubmission(models.Model):
     practice = models.ForeignKey("Practice", related_name="submissions", on_delete=models.CASCADE, default=1)
     user = models.ForeignKey("User", related_name="practice_submissions", on_delete=models.CASCADE, default=1)
     apptitude = models.ForeignKey("Apptitude", related_name="practice_submissions", on_delete=models.CASCADE, default=1)
-    user_choice = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(4)], default=1)
+    user_choice = models.IntegerField(validators=[MinValueValidator(0), MaxValueValidator(4)], default=1)
     time_taken = models.DurationField()
     answer = models.BooleanField(default=False)
     
