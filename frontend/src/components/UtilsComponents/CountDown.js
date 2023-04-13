@@ -2,7 +2,9 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 
-const CountDown = ({ time }) => {
+const CountDown = (props) => {
+    const time = props.time;
+    const goTo = props.redirectLink;
     const [countDown, setCountDown] = useState(time);
     const navigate = useNavigate();
     
@@ -15,7 +17,7 @@ const CountDown = ({ time }) => {
 
     useEffect(() => {
         if (countDown === 0) {
-            navigate("/");
+            navigate("/"+goTo);
         }
     }, [countDown, navigate]);
 

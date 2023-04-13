@@ -6,9 +6,12 @@ import CandidateSignup from './AuthComponents/CandidateSignup';
 import RecruiterSignup from './AuthComponents/RecruiterSignup';
 import Profile from './Profile/Profile';
 import { Container } from 'reactstrap';
+
+// Practice
 import PracticePage from './PracticeComponent/Practice';
 import PracticeDetails from './PracticeComponent/PracticeDetails';
-import PracticeQuiz from './quiz/PracticeQuiz';
+import PracticeQuiz from './PracticeComponent/PracticeQuiz';
+import PracticeResult from './PracticeComponent/PracticeResult';
 
 
 const NotFound = () => {
@@ -29,6 +32,7 @@ const Competitions = () => {
   );
 };
 
+
 function App() {
   return (
     <div className="App">
@@ -37,14 +41,23 @@ function App() {
         <Container>
           <Routes>
             <Route path="/" element={<Home />} />
+
+            {/* Auth */}
             <Route path="/login" element={<Login />} />
             <Route path="/profile" element={<Profile/>} />
             <Route path="/candidates/register" element={<CandidateSignup />} />
             <Route path="/recruiters/register" element={<RecruiterSignup />} />
+
+            {/* Practice */}
             <Route path="/practice" element={<PracticePage/>} />
             <Route path="/practice/:id" element={<PracticeDetails/>} />
-            <Route path="/practice/quiz" element={<PracticeQuiz/>} />
+            <Route path="/practice/quiz/:id" element={<PracticeQuiz/>} />
+            <Route path="/practice/:id/results" element={<PracticeResult/>} />
+
+            {/* Competitions */}
             <Route path="/competitions" element={<Competitions />} />
+
+            {/* 404 */}
             <Route path="/*" element={<NotFound />} />
           </Routes>
         </Container>

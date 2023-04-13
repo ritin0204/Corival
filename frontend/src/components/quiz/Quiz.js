@@ -12,6 +12,7 @@ import {
 }
 from 'reactstrap';
 import { useNavigate } from "react-router-dom";
+import QuizSubmission from "./QuizSubmission";
 
 
 const Question = (props) => {
@@ -62,6 +63,9 @@ const Quiz = (props) => {
     const [currentQuestion, setCurrentQuestion] = useState(0);
     const [currentSelected, setCurrentSelected] = useState(0);
     const [timeTaken, setTimeTaken] = useState(0);
+
+    const [submitted, setSubmitted] = useState(false);
+
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -81,20 +85,26 @@ const Quiz = (props) => {
 
     const handleSubmit = () => {
         const data = {
-            "practice": props.id,
             "apptitude": questions[currentQuestion].id,
             "user_choice": currentSelected,
             "time_taken": "00:00:" + timeTaken
         }
+        data[props.type] = props.id;
 
         if (currentQuestion + 1 < questions.length) {
             props.handleNext(data);
             setCurrentQuestion(currentQuestion + 1);
         } else {
             props.handleNext(data);
-            navigate(`/practice/${quizData.id}`)
+            setSubmitted(true);
         }
     };
+
+    if (submitted) {
+        return (
+            <QuizSubmission type={props.type} typeId={props.id} />
+        );
+    }
 
     return (
         <Container style={{maxWidth: "1024px"}}>

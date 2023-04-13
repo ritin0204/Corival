@@ -15,12 +15,13 @@ import {
     UncontrolledAlert,
 }
     from 'reactstrap';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getCsrfToken, fetchRequest } from '../../requests';
 import CountDown from '../UtilsComponents/CountDown';
 import { Link } from 'react-router-dom';
 
-const CreatePractice = ({setRedirect}) => {
+const CreatePractice = ({setPracticeId, setRedirect}) => {
+
     const [formData, setFormData] = useState({
         category: "All",
         difficulty: 1,
@@ -36,6 +37,7 @@ const CreatePractice = ({setRedirect}) => {
         .then(response => {
             if (response.status === 201) {
                 setRedirect(true);
+                setPracticeId(response.data.id);
             }
         })
         .catch(error => {
@@ -116,7 +118,8 @@ const PracticeItem = ({ practice
 const PracticeList = () => {
     const [practices, setPractices] = useState([]);
     const [loading, setLoading] = useState(true);
-    fetchRequest('/api/practice/', 'get')
+    useEffect(() => {
+        fetchRequest('/api/practice/', 'get')
         .then(response => {
             setPractices(response.data);
             setLoading(false);
@@ -124,6 +127,13 @@ const PracticeList = () => {
         .catch(error => {
             console.log(error);
         });
+
+        return () => {
+            setPractices([]);
+            setLoading(true);
+        }
+    }, []);
+
     if (loading) {
         return <div>Loading...</div>;
     }
@@ -140,8 +150,10 @@ const PracticeList = () => {
 
 const PracticePage = () => {
     const [redirect, setRedirect] = useState(false);
+    const [practiceId, setPracticeId] = useState(0);
+    console.log(practiceId);
     if (redirect) {
-        return <CountDown time={10}/>
+        return <CountDown time={10} redirectLink={`practice/quiz/${practiceId}`}/>
     }
     return (
         // There will be 6 types of view in practice page
@@ -157,7 +169,7 @@ const PracticePage = () => {
                     <PracticeList />
                 </Col>
                 <Col md="4">
-                    <CreatePractice setRedirect={setRedirect}/>
+                    <CreatePractice setRedirect={setRedirect} setPracticeId={setPracticeId}/>
                 </Col>
             </Row>
         </Container>
