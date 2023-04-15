@@ -2,6 +2,8 @@ from rest_framework import serializers
 from .models import *
 import random, datetime
 
+NUMBER_OF_QUESTIONS = 3
+
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
@@ -68,7 +70,7 @@ class RecruiterSerializer(serializers.ModelSerializer):
 class ChoiceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Choice
-        fields = ('question', 'choice', 'position')
+        fields = ('choice', 'position')
         
 
 class ApptitudeSerializer(serializers.ModelSerializer):
@@ -158,13 +160,12 @@ class PracticeSerializer(serializers.ModelSerializer):
         model = Practice
         fields = ['id', 'questions', 'category', 'difficulty', 'created_by', 'start_time', 'end_time', 'score']
         read_only_fields = ['end_time', 'start_time', 'questions', 'score', 'created_by']
-    
-    
+        
     def create(self, validated_data):
-        # fro future take number_of_questions from request
-        number_of_questions = 3
+        
+        global NUMBER_OF_QUESTIONS
         # 75% of time limit for each question 45 seconds min for easy, 1.5 minutes for medium, 2.25 minutes for hard
-        test_time_in_seconds = validated_data['difficulty'] * 60 * 0.75 * number_of_questions
+        test_time_in_seconds = validated_data['difficulty'] * 60 * 0.75 * NUMBER_OF_QUESTIONS
         # add 10 seconds for buffer and 10 seconds to start the test
         test_duration = datetime.timedelta(seconds=test_time_in_seconds + 20)
         
@@ -183,26 +184,27 @@ class PracticeSerializer(serializers.ModelSerializer):
                 difficulty=validated_data['difficulty']
             )
     
-        apptitude = random.sample(list(apptitude), number_of_questions)
+        apptitude = random.sample(list(apptitude), NUMBER_OF_QUESTIONS)
         validated_data['created_by'] = self.context['request'].user
         practice  = Practice.objects.create(**validated_data)
         practice.questions.set(apptitude)
         return practice
-
-
+    
 
 class PracticeSubmissionSerializer(serializers.ModelSerializer):
+    apptitude = models.ForeignKey(Apptitude, on_delete=models.CASCADE)
     class Meta:
         model = PracticeSubmission
-        fields = ['id', 'practice', 'user', 'answer', 'time_taken', 'user_choice', 'apptitude']
-        read_only_fields = ['user', 'answer']
+        fields = [ 'practice', 'answer', 'time_taken', 'user_choice', 'apptitude']
+        read_only_fields = ['answer']
+        extra_kwargs = {
+            'practice': {'write_only': True},
+        }
         
-        
+    
     def create(self, validated_data):
         validated_data['user'] = self.context['request'].user
-        
         if validated_data['user_choice'] == validated_data['apptitude'].answer_position:
             validated_data['answer'] = True
         practice_submission = PracticeSubmission.objects.create(**validated_data)
         return practice_submission
-    

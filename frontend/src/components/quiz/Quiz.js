@@ -9,6 +9,7 @@ import {
     Col,
     ListGroupItem,
     ListGroup,
+    Progress,
 }
 from 'reactstrap';
 import { useNavigate } from "react-router-dom";
@@ -21,6 +22,10 @@ const Question = (props) => {
 
     useEffect(() => {
         setSelected(0);
+
+        return () => {
+            setSelected(0);
+        }
     }, [props.q_num]);
 
     const handleSelect = (e) => {
@@ -41,7 +46,7 @@ const Question = (props) => {
             </ListGroupItem>
         );
     });
-
+    console.log(question);
     return (
         <Card>
             <CardBody>
@@ -61,16 +66,23 @@ const Question = (props) => {
 const Quiz = (props) => {
     const questions = props.questions;
     const [currentQuestion, setCurrentQuestion] = useState(0);
+    const [maxTime, setMaxTime] = useState(questions[currentQuestion].difficulty * 60 * 0.75);
     const [currentSelected, setCurrentSelected] = useState(0);
     const [timeTaken, setTimeTaken] = useState(0);
 
     const [submitted, setSubmitted] = useState(false);
 
-    const navigate = useNavigate();
 
     useEffect(() => {
         setCurrentSelected(0);
         setTimeTaken(0);
+        setMaxTime(questions[currentQuestion].difficulty * 60 * 0.75);
+        return () => {
+            setCurrentSelected(0);
+            setTimeTaken(0);
+            setMaxTime(questions[currentQuestion].difficulty * 60 * 0.75);
+        }
+
     }, [currentQuestion]);
 
     const time = () => {
@@ -79,6 +91,9 @@ const Quiz = (props) => {
 
     useEffect(() => {
         const timer = setInterval(time, 1000);
+        if (timeTaken >= maxTime) {
+            handleSubmit();
+        }
         return () => clearInterval(timer);
     }, [timeTaken]);
 
@@ -108,7 +123,9 @@ const Quiz = (props) => {
 
     return (
         <Container style={{maxWidth: "1024px"}}>
+            <p>{currentQuestion+1} out of {questions.length}</p>
             <Row>
+                <Progress value={timeTaken} className="my-2" style={{height: "3px"}} max={maxTime} color="danger"/>
                 <Col>
                     <Question question={questions[currentQuestion]} q_num={currentQuestion+1} setCurrentSelected={setCurrentSelected}/>
                     <Button color="success" className="my-2 float-end" onClick={handleSubmit}>Submit & Next</Button>

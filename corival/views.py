@@ -111,6 +111,11 @@ class ContestViewSet(viewsets.ModelViewSet):
     queryset = Contest.objects.all()
     serializer_class = ContestSerializer
     
+    # We'll define permission later on
+    
+    
+    
+    
     
 class ContestSubmissionViewSet(viewsets.ModelViewSet):
     queryset = ContestSubmission.objects.all()
@@ -136,11 +141,30 @@ class ChallengeLeaderboardViewSet(viewsets.ModelViewSet):
     queryset = ChallengeLeaderboard.objects.all()
     serializer_class = ChallengeLeaderboardSerializer
     
-    
+
 class PracticeViewSet(viewsets.ModelViewSet):
     queryset = Practice.objects.all()
     serializer_class = PracticeSerializer
     permission_classes = [IsAuthenticated]
+    
+    
+    def create(self, request, *args, **kwargs):
+        return super().create(request, *args, **kwargs)
+    
+    def retrieve(self, request, *args, **kwargs):
+        response = super().retrieve(request, *args, **kwargs)
+        practice = Practice.objects.get(id=kwargs['pk'])
+        if practice.get_results().count() == practice.questions.all().count() or practice.end_time < utc.localize(datetime.datetime.utcnow()):
+            results = PracticeSubmissionSerializer(practice.get_results(),many=True)
+            for result in results.data:
+                apptitude = Apptitude.objects.get(id=result["apptitude"])
+                result["answer_position"] = apptitude.get_answer()
+                result["apptitude"] = ApptitudeSerializer(apptitude,many=False).data
+            response.data['results'] = results.data
+            response.data['score'] = practice.get_score()
+            del response.data['questions']
+            return Response(response.data,status=200)
+        return response
     
     
 class PracticeSubmissionViewSet(viewsets.ModelViewSet):
@@ -158,10 +182,4 @@ class PracticeSubmissionViewSet(viewsets.ModelViewSet):
     def update(self, request, *args, **kwargs):
         return JsonResponse({"error":"You cannot update a submission"},status=400)
     
-    def get_queryset(self):
-        print("get_queryset called")
-        return PracticeSubmission.objects.filter(user=self.request.user)
     
-    def get(self, request, *args, **kwargs):
-        print("get method called")
-        return self.retrieve(request, *args, **kwargs)

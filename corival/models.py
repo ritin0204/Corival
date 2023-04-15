@@ -87,6 +87,12 @@ class Apptitude(models.Model):
     
     def __str__(self):
         return self.question
+    
+    def get_choices(self):
+        return self.choices.all()
+    
+    def get_answer(self):
+        return self.answer_position
 
 
 class Choice(models.Model):
@@ -177,6 +183,7 @@ class ChallengeLeaderboard(models.Model):
     
     class Meta:
         ordering = ["-score"]
+
         
 class Practice(models.Model):
     created_by = models.ForeignKey("User", related_name="practice", on_delete=models.CASCADE, default=1)
@@ -190,8 +197,24 @@ class Practice(models.Model):
     
     def __str__(self):
         return str(self.id)
-        
-        
+    
+    
+    def get_results(self):
+        submmsions = self.submissions.all()
+        return submmsions
+    
+    
+    def get_score(self):
+        submissions = self.submissions.all()
+        if self.score != 0:
+            return self.score
+        if submissions.count() == 0:
+            return 0
+        score = submissions.filter(answer=True).count()/submissions.count()
+        self.score = int(score*100)
+        return self.score
+    
+
 class PracticeSubmission(models.Model):
     practice = models.ForeignKey("Practice", related_name="submissions", on_delete=models.CASCADE, default=1)
     user = models.ForeignKey("User", related_name="practice_submissions", on_delete=models.CASCADE, default=1)
@@ -206,7 +229,7 @@ class PracticeSubmission(models.Model):
         ]
     
     def __str__(self):
-        return self.practice.id
+        return str(self.practice.id)
     
     
 

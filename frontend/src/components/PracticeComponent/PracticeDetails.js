@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { Card, CardBody, CardTitle, ListGroup, ListGroupItem, Button } from "reactstrap";
 import fetchRequest from "../../requests";
 import { useEffect, useState } from "react";
@@ -18,7 +18,6 @@ const PracticeDetails = () => {
                 setLoading(false);
             })
             .catch((error) => {
-                console.log(error);
                 navigate("/404");
             });
     }, []);
@@ -35,12 +34,11 @@ const PracticeDetails = () => {
                     <ListGroupItem>Category: {practice.category}</ListGroupItem>
                     <ListGroupItem>Difficulty: {practice.difficulty}</ListGroupItem>
                     <ListGroupItem>
-                        Questions:
-                        <ListGroup>
-                            {practice.questions.map((question) => (
-                                <ListGroupItem key={question.id}>{question.question}</ListGroupItem>
-                            ))}
-                        </ListGroup>
+                    <Link to={`/practice/${practice.id}/results`}>
+                        <Button color="primary" className="my-2" outline>
+                            See Results
+                        </Button>
+                    </Link>
                     </ListGroupItem>
                     <ListGroupItem> Start: {practice.start_time}</ListGroupItem>
                     <ListGroupItem> End: {practice.end_time}</ListGroupItem>
