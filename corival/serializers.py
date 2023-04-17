@@ -1,8 +1,9 @@
 from rest_framework import serializers
 from .models import *
-import random, datetime
+from .utlis import QuestionSetter
 
-NUMBER_OF_QUESTIONS = 3
+NUMBER_OF_QUESTIONS_IN_PRACTICE = 3
+NUMBER_OF_QUESTIONS_IN_CONTEST = 3
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -58,6 +59,7 @@ class RecruiterSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['date_joined', 'last_login', 'is_recruiter', 'is_candidate']
         write_only_fields = ['password']
+    
     
     def create(self, validated_data):
         password = validated_data.pop('password')
@@ -118,22 +120,60 @@ class ApptitudeSerializer(serializers.ModelSerializer):
         
 
 class ContestSerializer(serializers.ModelSerializer):
-    apptitude = ApptitudeSerializer(many=True, read_only=True)
     class Meta:
         model = Contest
-        fields = '__all__'
+        fields = [
+            'id',
+            'title',
+            'description',
+            'category',
+            'difficulty',
+            'start_time',
+            'end_time',
+            'created_by',
+            'created_at',
+        ]
+        read_only_fields = [ 'created_by', 'created_at', 'end_time']
+    
+    
+    def create(self, validated_data):
+        global NUMBER_OF_QUESTIONS_IN_CONTEST
+        
+        apptitudeObj = QuestionSetter(category=validated_data['category'], difficulty= validated_data['difficulty'],N= NUMBER_OF_QUESTIONS_IN_CONTEST, start_time=validated_data['start_time'])
+        
+        validated_data['end_time'] = apptitudeObj.end_time
+        apptitude = apptitudeObj.apptitude
+        
+        validated_data['created_by'] = self.context['request'].user
+        contest = Contest.objects.create(**validated_data)
+        contest.questions.set(apptitude)
+        return contest
         
 
 class ContestSubmissionSerializer(serializers.ModelSerializer):
+    apptitude = models.ForeignKey(Apptitude, on_delete=models.CASCADE)
     class Meta:
         model = ContestSubmission
-        fields = '__all__'
+        fields = ['contest', 'user', 'apptitude', 'user_choice', 'answer', 'time_taken']
+        read_only_fields = ['answer']
+        extra_kwargs = {
+            'contest': {'write_only': True},
+        }
+        
+    def create(self, validated_data):
+        validated_data['user'] = self.context['request'].user
+        if validated_data['apptitude'].answer_position == validated_data['user_choice']:
+            validated_data['answer'] = True
+        return ContestSubmission.objects.create(**validated_data)
         
 
 class ContestLeaderboardSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContestLeaderboard
         fields = '__all__'
+        
+        read_only_fields = ['contest', 'user', 'score', 'time_taken']
+        ordering = ['-score', 'time_taken']
 
 
 class ChallengeSerializer(serializers.ModelSerializer):
@@ -161,30 +201,15 @@ class PracticeSerializer(serializers.ModelSerializer):
         fields = ['id', 'questions', 'category', 'difficulty', 'created_by', 'start_time', 'end_time', 'score']
         read_only_fields = ['end_time', 'start_time', 'questions', 'score', 'created_by']
         
+        
     def create(self, validated_data):
         
-        global NUMBER_OF_QUESTIONS
-        # 75% of time limit for each question 45 seconds min for easy, 1.5 minutes for medium, 2.25 minutes for hard
-        test_time_in_seconds = validated_data['difficulty'] * 60 * 0.75 * NUMBER_OF_QUESTIONS
-        # add 10 seconds for buffer and 10 seconds to start the test
-        test_duration = datetime.timedelta(seconds=test_time_in_seconds + 20)
+        global NUMBER_OF_QUESTIONS_IN_PRACTICE
         
-        validated_data['end_time'] = datetime.datetime.now() + test_duration
+        apptitudeObj = QuestionSetter(validated_data['category'], validated_data['difficulty'], NUMBER_OF_QUESTIONS_IN_PRACTICE)
+        validated_data['end_time'] = apptitudeObj.end_time
+        apptitude = apptitudeObj.apptitude
         
-        if validated_data['category'] == 'All':
-            
-            apptitude = Apptitude.objects.filter(
-                difficulty=validated_data['difficulty']
-            )
-            
-        else:
-            
-            apptitude = Apptitude.objects.filter(
-                category=validated_data['category'],
-                difficulty=validated_data['difficulty']
-            )
-    
-        apptitude = random.sample(list(apptitude), NUMBER_OF_QUESTIONS)
         validated_data['created_by'] = self.context['request'].user
         practice  = Practice.objects.create(**validated_data)
         practice.questions.set(apptitude)

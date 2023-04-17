@@ -34,6 +34,8 @@ urlpatterns = [
     path('',TemplateView.as_view(template_name='frontend/index.html')),
     path('api/',include(routes.urls)),
     
+    path('api/contest-leaderboard/<int:contest_id>/',ContestLeaderboardViewSet.as_view({'get':'list'}),name='contest-leaderboard-list'),
+    path('api/contest-leaderboard/<int:contest_id>/<str:username>/',ContestLeaderboardViewSet.as_view({'get':'retrieve'}),name='contest-leaderboard-retrieve'),
     # For Authentication
     path('rivals/user',current_user,name='current_user'), # path('register',views.register_view,name='register-view'),
     path('login',AuthView.as_view(), name='login-view'),

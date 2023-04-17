@@ -3,6 +3,7 @@ from django.contrib.auth.models import AbstractUser
 from django.core.validators import MinValueValidator, MaxValueValidator
 import datetime
 
+
 # Create your models here.
 class User(AbstractUser):
     username = models.CharField(max_length=100, unique=True, primary_key=True)
@@ -121,16 +122,23 @@ class Contest(models.Model):
     created_by = models.ForeignKey("User", related_name="contests", on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     
-    def __str__(self):
-        return self.name
     
+    def __str__(self):
+        return self.title
+    
+    
+    def get_questions(self):
+        return self.questions.all()
+
 
 class ContestSubmission(models.Model):
     contest = models.ForeignKey("Contest", related_name="submissions", on_delete=models.CASCADE)
     user = models.ForeignKey("User", related_name="submissions", on_delete=models.CASCADE)
     apptitude = models.ForeignKey("Apptitude", related_name="submissions", on_delete=models.CASCADE)
-    timm_took = models.TimeField()
+    time_taken = models.DurationField()
+    user_choice = models.IntegerField("user_choice", validators=[MinValueValidator(0), MaxValueValidator(4)], default=0)
     answer = models.BooleanField(default=False)
+    
     
     def __str__(self):
         return self.user.username
@@ -140,10 +148,13 @@ class ContestLeaderboard(models.Model):
     contest = models.ForeignKey("Contest", related_name="leaderboard", on_delete=models.CASCADE)
     user = models.ForeignKey("User", related_name="leaderboard", on_delete=models.CASCADE)
     score = models.IntegerField(default=0)
+    time_taken = models.DurationField(null=True)
     
     class Meta:
-        ordering = ["-score"]
-        
+        ordering = ["-score", "time_taken"]
+        unique_together = [
+            ("contest", "user")
+        ]
         
     def __str__(self):
         return self.user.username
@@ -178,7 +189,7 @@ class ChallengeSubmission(models.Model):
 class ChallengeLeaderboard(models.Model):
     challenge = models.ForeignKey("Challenge", related_name="leaderboard", on_delete=models.CASCADE)
     user = models.ForeignKey("User", related_name="challenge_leaderboard", on_delete=models.CASCADE)
-    score = models.IntegerField(default=0)
+    score = models.FloatField(default=0)
     
     
     class Meta:
@@ -192,7 +203,7 @@ class Practice(models.Model):
     questions = models.ManyToManyField(Apptitude)
     start_time = models.DateTimeField(auto_now_add=True)
     end_time = models.DateTimeField()
-    score = models.IntegerField(default=0)
+    score = models.FloatField(default=0)
     
     
     def __str__(self):
@@ -211,7 +222,7 @@ class Practice(models.Model):
         if submissions.count() == 0:
             return 0
         score = submissions.filter(answer=True).count()/submissions.count()
-        self.score = int(score*100)
+        self.score = float(score*100)
         return self.score
     
 

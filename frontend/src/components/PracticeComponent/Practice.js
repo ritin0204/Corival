@@ -156,13 +156,6 @@ const PracticePage = () => {
         return <CountDown time={10} redirectLink={`practice/quiz/${practiceId}`}/>
     }
     return (
-        // There will be 6 types of view in practice page
-        // 1. All completed Practices List
-        // 2. Completed Practice Detail
-        // 3. Pre Practice Page
-        // 4. Quiz Page
-        // 5. Practice submission Page
-        // 6. Practice Result Page
         <Container className='my-4' color='secondary' style={{fontSize: "18px"}}>
             <Row>
                 <Col md="6">
