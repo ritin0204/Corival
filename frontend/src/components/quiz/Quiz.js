@@ -12,7 +12,6 @@ import {
     Progress,
 }
 from 'reactstrap';
-import { useNavigate } from "react-router-dom";
 import QuizSubmission from "./QuizSubmission";
 
 
@@ -46,7 +45,6 @@ const Question = (props) => {
             </ListGroupItem>
         );
     });
-    console.log(question);
     return (
         <Card>
             <CardBody>
@@ -102,15 +100,18 @@ const Quiz = (props) => {
         const data = {
             "apptitude": questions[currentQuestion].id,
             "user_choice": currentSelected,
-            "time_taken": "00:00:" + timeTaken
+            "time_taken": `00:00:${timeTaken}`
         }
         data[props.type] = props.id;
 
         if (currentQuestion + 1 < questions.length) {
             props.handleNext(data);
+            console.log(data);
             setCurrentQuestion(currentQuestion + 1);
         } else {
-            props.handleNext(data);
+            if (submitted === false) {
+                props.handleNext(data);
+            }
             setSubmitted(true);
         }
     };

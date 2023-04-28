@@ -19,9 +19,9 @@ const PracticeResult = () => {
         console.log(error);
       });
 
-      // return () => {
-      //     setPracticeDetails({});
-      // }
+      return () => {
+          setPracticeDetails({});
+      }
   }, []);
   if (isLoading) {
     return <div>Loading...</div>;

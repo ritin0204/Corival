@@ -1,50 +1,61 @@
 import {
-    Container,
-    Row,
-    Col,
-    CardDeck,
-    Card,
     Button,
     Form,
+    FormGroup,
+    Label,
     Input,
+    Card,
     CardBody,
     CardTitle,
-    ListGroup,
-    ListGroupItem,
-    FormGroup,
     UncontrolledAlert,
 }
-    from 'reactstrap';
-import { useEffect, useState } from 'react';
-import { fetchRequest } from '../../requests';
-import CountDown from '../UtilsComponents/CountDown';
-import { Link } from 'react-router-dom';
+from 'reactstrap';
+import { useState } from 'react';
+import { fetchRequest, getCurrentUser } from '../../requests';
 
-const CreatePractice = ({setPracticeId, setRedirect}) => {
 
+const CreateContest = ({ setContestId, setRedirect}) => {
+    const [currentUser, setCurrentUser] = useState(getCurrentUser());
     const [formData, setFormData] = useState({
+        title : "",
+        description : "",
         category: "All",
         difficulty: 1,
+        start_time: ""
     });
+
+    const checkForm = () => {
+        if (formData.title === "" || formData.description === "" || formData.start_time === "" ) {
+            return false;
+        }
+        return true;
+    }
 
     function handleSubmit(event, path, formData) {
         event.preventDefault();
+        if( checkForm() === false) {
+            document.getElementById('submission-alert').innerHTML = "Please fill all the fields";
+            document.getElementById('submission-alert').classList.remove('d-none');
+            return;
+        }
+        document.getElementById('submission-alert').classList.add('d-none');
+        document.getElementById('submit-btn').disabled = true;
         let data = new FormData();
         for (let key in formData) {
             data.append(key, formData[key]);
         }
-
         fetchRequest(`/${path}`, 'post', data)
         .then(response => {
             if (response.status === 201) {
                 setRedirect(true);
-                setPracticeId(response.data.id);
+                setContestId(response.data.id);
             }
         })
         .catch(error => {
             document.getElementById('submission-alert').innerHTML = error.response.data.detail;
             document.getElementById('submission-alert').classList.remove('d-none');
         });
+        document.getElementById('submit-btn').disabled = false;
     }
 
     
@@ -55,12 +66,27 @@ const CreatePractice = ({setPracticeId, setRedirect}) => {
         }));
     };
 
+
+    if (currentUser === null || currentUser.is_recruiter === false) {
+        return (
+            <></>
+        );
+    }
+
     return (
         <Card color="success" outline>
             <CardBody>
-                <CardTitle>Create Practice</CardTitle>
+                <CardTitle><strong>Create Contest</strong></CardTitle>
                 <UncontrolledAlert id='submission-alert' color="danger" className='p-2 d-none'></UncontrolledAlert>
-                <Form onSubmit={(e) => { handleSubmit(e, "api/practice/", formData) }}>
+                <Form onSubmit={(e) => { handleSubmit(e, "api/contests/", formData) }}>
+                    <FormGroup>
+                        <Label for="title">Title</Label>
+                        <Input bsSize="sm" className="mb-3" type="text" name="title" id="title" placeholder="Title" onChange={handleChange} />
+                    </FormGroup>
+                    <FormGroup>
+                        <Label for="description">Description</Label>
+                        <Input bsSize="sm" className="mb-3" type="textarea" name="description" id="description" placeholder="Description" onChange={handleChange} />
+                    </FormGroup>
                     <FormGroup>
                         <label>Category</label>
                         <Input bsSize="sm" className="mb-3" name="category" type="select"  onChange={handleChange}>
@@ -90,87 +116,15 @@ const CreatePractice = ({setPracticeId, setRedirect}) => {
                             <option value="3">Hard</option>
                         </Input>
                     </FormGroup>
-                    <Button size='sm' className="float-end" color="success">Create Practice</Button>
+                    <FormGroup>
+                        <Label for="start_time">Start Time</Label>
+                        <Input bsSize="sm" className="mb-3" type="datetime-local" name="start_time" id="start_time" placeholder="Start Time" onChange={handleChange} />
+                    </FormGroup>
+                    <Button size='sm' id="submit-btn" className="float-end" color="success">Create</Button>
                 </Form>
             </CardBody>
         </Card >
     );
 };
 
-
-const PracticeItem = ({ practice
-}) => {
-    return (
-        <Card color="primary" className='my-2' outline>
-            <CardBody>
-                <CardTitle>Practice Id: {practice.id}</CardTitle>
-                <ListGroup >
-                    <ListGroupItem>Category: {practice.category}</ListGroupItem>
-                    <ListGroupItem>Difficulty: {practice.difficulty}</ListGroupItem>
-                </ListGroup>
-                <Link to={`/practice/${practice.id}/`}>
-                    <Button size='sm' className="my-2 float-end" color="primary">View Details</Button>
-                </Link>
-            </CardBody>
-        </Card>
-    );
-};
-
-const PracticeList = () => {
-    const [practices, setPractices] = useState([]);
-    const [loading, setLoading] = useState(true);
-    useEffect(() => {
-        fetchRequest('/api/practice/', 'get')
-        .then(response => {
-            setPractices(response.data);
-            setLoading(false);
-        })
-        .catch(error => {
-            console.log(error);
-        });
-
-        return () => {
-            setPractices([]);
-            setLoading(true);
-        }
-    }, []);
-
-    if (loading) {
-        return <div>Loading...</div>;
-    }
-    return (
-        <CardDeck>
-            <h2>Practice List</h2>
-            {practices.map((practice) => (
-                <PracticeItem practice={practice} key={practice.id} />
-            ))
-            }
-        </CardDeck>
-    );
-};
-
-const PracticePage = () => {
-    const [redirect, setRedirect] = useState(false);
-    const [practiceId, setPracticeId] = useState(0);
-
-    if (redirect) {
-        const redirectTime = new Date();
-        redirectTime.setSeconds(redirectTime.getSeconds() + 10);
-        return <CountDown time={redirectTime} redirectLink={`practice/quiz/${practiceId}`}/>
-    }
-    
-    return (
-        <Container className='my-4' color='secondary' style={{fontSize: "18px"}}>
-            <Row>
-                <Col md="6">
-                    <PracticeList />
-                </Col>
-                <Col md="4">
-                    <CreatePractice setPracticeId={setPracticeId} setRedirect={setRedirect}/>
-                </Col>
-            </Row>
-        </Container>
-    );
-};
-
-export default PracticePage;
+export default CreateContest;

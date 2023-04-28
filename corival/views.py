@@ -139,7 +139,7 @@ class ContestViewSet(viewsets.ModelViewSet):
             if contest.start_time > utc.localize(datetime.datetime.utcnow()):
                 response.data['status'] = "upcoming"
             elif contest.end_time < utc.localize(datetime.datetime.utcnow()):
-                response.data['status'] = "previous"
+                response.data['status'] = "previous"    
             else:
                 response.data['status'] = "ongoing"
                 response.data['questions'] = ApptitudeSerializer(contest.get_questions(),many=True).data
@@ -164,16 +164,17 @@ class ContestSubmissionViewSet(viewsets.ModelViewSet):
         elif contest.end_time < utc.localize(datetime.datetime.utcnow()):
             return Response({"error":"Contest is over"},status=400)
         else:
+            request.data['user'] = request.user
             response = super().create(request, *args, **kwargs)
             if response.status_code == 201:
                 contestLeaderBoard = ContestLeaderboard.objects.filter(contest=contest,user=request.user.username)
+                rightSubmission = 1 if response.data['answer'] else 0
                 if contestLeaderBoard.count() == 0:
-                    rightSubmission = 1 if response.data['answer'] else 0
                     score = (rightSubmission/TOTAL_QUESTIONS)*100
                     timeSpent = datetime.datetime.strptime(response.data['time_taken'], '%H:%M:%S') - datetime.datetime.strptime('00:00:00', '%H:%M:%S')
                     ContestLeaderboard.objects.create(contest=contest,user=request.user, score=score, time_taken=timeSpent)
                 else:
-                    score = contestLeaderBoard[0].score + ((1/TOTAL_QUESTIONS)*100)
+                    score = contestLeaderBoard[0].score + ((rightSubmission/TOTAL_QUESTIONS)*100)
                     timeSpent = (datetime.datetime.strptime(response.data['time_taken'], '%H:%M:%S') - datetime.datetime.strptime('00:00:00', '%H:%M:%S'))+ contestLeaderBoard[0].time_taken
                     contestLeaderBoard.update(score=score, time_taken=timeSpent)
         return response
@@ -196,7 +197,8 @@ class ContestLeaderboardViewSet(viewsets.ModelViewSet):
             return Response({"error":"Contest is not started yet"},status=400)
         elif contest.end_time < utc.localize(datetime.datetime.utcnow()):
             contest_leaderboard = ContestLeaderboard.objects.filter(contest=contest)
-            return Response(ContestLeaderboardSerializer(contest_leaderboard,many=True).data)
+            leaderboard_response = ContestLeaderboardSerializer(contest_leaderboard,many=True).data
+            return Response(leaderboard_response)
         else:
             return Response({"error":"Contest is ongoing"},status=400)
         
@@ -216,6 +218,7 @@ class ContestLeaderboardViewSet(viewsets.ModelViewSet):
                 result["answer_position"] = apptitude.get_answer()
                 result["apptitude"] = ApptitudeSerializer(apptitude,many=False).data
             response.data['results'] = results.data
+            response.data['contest'] = Contest.objects.get(id=contest_id).title
             return response
             
     
@@ -239,10 +242,23 @@ class PracticeViewSet(viewsets.ModelViewSet):
     serializer_class = PracticeSerializer
     permission_classes = [IsAuthenticated]
     
+    
+    def get_queryset(self):
+        return super().get_queryset().filter(created_by=self.request.user)
+    
+    
+    def create(self, request, *args, **kwargs):
+        if request.user.is_recruiter:
+            return JsonResponse({"error":"Recruiters cannot create practice"},status=400)
+        response = super().create(request, *args, **kwargs)
+        return response
+    
+    
     def retrieve(self, request, *args, **kwargs):
         response = super().retrieve(request, *args, **kwargs)
         practice = Practice.objects.get(id=kwargs['pk'])
-        if practice.get_results().count() == practice.questions.all().count() or practice.end_time < utc.localize(datetime.datetime.utcnow()):
+        submission_count = PracticeSubmission.objects.filter(practice=practice,user=request.user).count()
+        if submission_count > 0 or practice.end_time < utc.localize(datetime.datetime.utcnow()):
             results = PracticeSubmissionSerializer(practice.get_results(),many=True)
             for result in results.data:
                 apptitude = Apptitude.objects.get(id=result["apptitude"])
@@ -252,6 +268,7 @@ class PracticeViewSet(viewsets.ModelViewSet):
             response.data['score'] = practice.get_score()
             del response.data['questions']
         return response
+
     
     
 class PracticeSubmissionViewSet(viewsets.ModelViewSet):
@@ -259,11 +276,15 @@ class PracticeSubmissionViewSet(viewsets.ModelViewSet):
     serializer_class = PracticeSubmissionSerializer
     permission_classes = [IsAuthenticated]
     
+    def list(self, request, *args, **kwargs):
+        return JsonResponse({"error":"You cannot view all submissions"},status=400)
+    
     def create(self, request, *args, **kwargs):
         practice = Practice.objects.get(id=request.data['practice'])
         if practice.end_time < utc.localize(datetime.datetime.utcnow()):
             return JsonResponse({"error":"Practice has ended"},status=400)
         response = super().create(request, *args, **kwargs)
+        
         return response
     
     def update(self, request, *args, **kwargs):

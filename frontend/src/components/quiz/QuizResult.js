@@ -68,6 +68,7 @@ const QuestionResult = ({ result, index }) => {
 
 
 const QuizResult = ({ results }) => {
+  console.log(results);
   const questionResults = []
   const correct = results.filter((result) => result.answer).length;
   results.forEach((element, index) => {

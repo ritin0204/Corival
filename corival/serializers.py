@@ -168,6 +168,11 @@ class ContestSubmissionSerializer(serializers.ModelSerializer):
         
 
 class ContestLeaderboardSerializer(serializers.ModelSerializer):
+    rank = serializers.SerializerMethodField()
+    
+    def get_rank(self, obj):
+        return ContestLeaderboard.objects.filter(score__gt=obj.score, contest=obj.contest).count() + 1
+    
     class Meta:
         model = ContestLeaderboard
         fields = '__all__'

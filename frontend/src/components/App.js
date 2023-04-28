@@ -13,24 +13,13 @@ import PracticeDetails from './PracticeComponent/PracticeDetails';
 import PracticeQuiz from './PracticeComponent/PracticeQuiz';
 import PracticeResult from './PracticeComponent/PracticeResult';
 
+// Contests
+import ContestPage from './ContestComponents/ContestPage';
+import ContestDetails from './ContestComponents/ContestDetails';
+import ContestResult from './ContestComponents/ContestResult';
+import ContestQuiz from './ContestComponents/ContestQuiz';
 
-const NotFound = () => {
-  return (
-    <div>
-      <h1>404</h1>
-      <h2>Page Not Found</h2>
-    </div>
-  );
-};
-
-
-const Competitions = () => {
-  return (
-    <div>
-      <h1>Competitions</h1>
-    </div>
-  );
-};
+import Error from './UtilsComponents/Error';
 
 
 function App() {
@@ -55,10 +44,14 @@ function App() {
             <Route path="/practice/:id/results" element={<PracticeResult/>} />
 
             {/* Competitions */}
-            <Route path="/competitions" element={<Competitions />} />
+            <Route path="/contests" element={<ContestPage />} />
+            <Route path="/contest/:id" element={<ContestDetails />} />
+            <Route path="/contest/:id/quiz/" element={<ContestQuiz />} />
+            <Route path="/contest/:id/results" element={ <ContestDetails/>} />
+            <Route path="/contest/:id/results/:user" element={<ContestResult />} />
 
             {/* 404 */}
-            <Route path="/*" element={<NotFound />} />
+            <Route path="/*" element={<Error status_code="404" message="Not Found!" />} />
           </Routes>
         </Container>
       </BrowserRouter>

@@ -14,10 +14,20 @@ import { getCurrentUser } from '../requests';
 import Logout from './AuthComponents/Logout';
 
 
-const RecruiterSections = (props) => {
+const RecruiterSections = () => {
     return (
         <div>
-            <h1>RecruiterSections</h1>
+            <Card className="my-2" color="primary" outline>
+                <CardBody>
+                    <CardTitle tag="h5">Compete</CardTitle>
+                    <CardText>
+                        Compete with your friends to see who can get the most points.
+                    </CardText>
+                    <Link to={'/contests'} >
+                        <Button size="sm" color="primary">Compete</Button>
+                    </Link>
+                </CardBody>
+            </Card>
         </div>
     );
 }
@@ -45,7 +55,7 @@ const Home = () => {
                         <Logout className="float-right my-2 mx-2" />
                     </CardBody>
                 </Card>
-                {user.is_recruiter ? <RecruiterSections /> : <Sections user={user} />}
+                {user.is_recruiter ? <RecruiterSections user={user} /> : <Sections user={user} />}
             </Container>
         );
     }
@@ -66,7 +76,7 @@ const Sections = (props) => {
                     <CardText>
                         Compete with your friends to see who can get the most points.
                     </CardText>
-                    <Link to={'/compete'}>
+                    <Link to={'/contests'}>
                         <Button size="sm" color="primary">Compete</Button>
                     </Link>
                 </CardBody>

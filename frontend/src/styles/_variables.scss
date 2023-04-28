@@ -1,0 +1,112 @@
+// Typography
+$primary-font: "Open Sans", sans-serif;
+$secondary-font: "Montserrat", sans-serif;
+$h1-font-size: 36px;
+$h1-font-weight: bold;
+$h1-color: #212121;
+$h2-font-size: 24px;
+$h2-font-weight: bold;
+$h2-color: #212121;
+$h3-font-size: 18px;
+$h3-font-weight: bold;
+$h3-color: #212121;
+$body-font-size: 16px;
+$body-color: #555555;
+$button-font-size: 16px;
+$button-font-weight: bold;
+$button-color: #FFFFFF;
+$link-font-size: 16px;
+$link-color: #0077CC;
+
+// Color
+$primary-color: #0077CC;
+$secondary-color: #FFC107;
+$text-color: #212121;
+$background-color: #FFFFFF;
+$border-color: #CCCCCC;
+$success-color: #4CAF50;
+$warning-color: #FF9800;
+$error-color: #FF5722;
+
+
+@mixin flexbox($direction: row, $justify: flex-start, $align: stretch, $wrap: nowrap) {
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-orient: $direction;
+    -webkit-box-direction: normal;
+        -ms-flex-direction: $direction;
+            flex-direction: $direction;
+    -webkit-box-pack: $justify;
+        -ms-flex-pack: $justify;
+            justify-content: $justify;
+    -webkit-box-align: $align;
+        -ms-flex-align: $align;
+            align-items: $align;
+    -webkit-box-lines: $wrap;
+        -ms-flex-wrap: $wrap;
+            flex-wrap: $wrap;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: $primary-font;
+    font-weight: $h1-font-weight;
+    color: $h1-color;
+}
+
+p {
+    font-family: $secondary-font;
+    font-size: $body-font-size;
+    color: $body-color;
+}
+
+a {
+    font-family: $secondary-font;
+    font-size: $link-font-size;
+    color: $link-color;
+    text-decoration: none;
+}
+
+button {
+    font-family: $secondary-font;
+    font-size: $button-font-size;
+    font-weight: $button-font-weight;
+    color: $button-color;
+    background-color: $primary-color;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: darken($primary-color, 10%);
+}
+
+button:active {
+    background-color: darken($primary-color, 20%);
+}
+
+button:focus {
+    outline: none;
+}
+
+@mixin card-border(){
+    -webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+    -moz-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+    box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);
+}
+
+
+@mixin card($width: 100%, $height: auto, $background: $background-color, $padding: 16px) {
+    width: $width;
+    height: $height;
+    background-color: $background;
+    border: 1px solid $border-color;
+    padding: $padding;
+}

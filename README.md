@@ -10,3 +10,5 @@
 - Make logout non-reloadable
 - CSRF Protection is not working in login and registration
 - Apply Validator for your Serializers
+- Fixing Contest Ranking
+- Apply React Auth More efficiently

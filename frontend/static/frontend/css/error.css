@@ -1,0 +1,116 @@
+body {
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Open Sans", sans-serif;
+  font-weight: bold;
+  color: #212121;
+}
+
+p {
+  font-family: "Montserrat", sans-serif;
+  font-size: 16px;
+  color: #555555;
+}
+
+a {
+  font-family: "Montserrat", sans-serif;
+  font-size: 16px;
+  color: #0077CC;
+  text-decoration: none;
+}
+
+button {
+  font-family: "Montserrat", sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  color: #FFFFFF;
+  background-color: #0077CC;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #005999;
+}
+
+button:active {
+  background-color: #003c66;
+}
+
+button:focus {
+  outline: none;
+}
+
+.error-div {
+  color: #FF5722;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  -webkit-box-lines: nowrap;
+  flex-wrap: nowrap;
+  width: 100vw;
+  height: 100vh;
+}
+.error-div .error-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  -o-object-fit: contain;
+     object-fit: contain;
+  opacity: 0.2;
+}
+.error-div .container {
+  text-align: center;
+  border-radius: 4px;
+  padding: 2rem 3rem;
+}
+.error-div .container h1 {
+  font-size: 5rem;
+  font-weight: 700;
+  margin: 1rem;
+  color: #FF5722;
+}
+.error-div .container p {
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin: 1rem;
+}
+.error-div .container .error-code {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+.error-div .container .error-message {
+  font-size: 1rem;
+  font-weight: 500;
+  margin: 1rem;
+}
+.error-div .container .error-button {
+  margin: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  background-color: #0077CC;
+  color: #FFFFFF;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease-in-out;
+}
+.error-div .container .error-button:hover {
+  background-color: #005999;
+}
+.error-div .container .error-button:active {
+  background-color: #003c66;
+}
+.error-div .container .error-button:focus {
+  outline: none;
+}/*# sourceMappingURL=error.css.map */

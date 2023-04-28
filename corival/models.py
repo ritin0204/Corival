@@ -217,12 +217,13 @@ class Practice(models.Model):
     
     def get_score(self):
         submissions = self.submissions.all()
+        questions = self.questions.all()
         if self.score != 0:
             return self.score
         if submissions.count() == 0:
             return 0
-        score = submissions.filter(answer=True).count()/submissions.count()
-        self.score = float(score*100)
+        score = submissions.filter(answer=True).count()/questions.count()
+        self.score = "{:.2f}".format(score*100)
         return self.score
     
 
