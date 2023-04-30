@@ -17,6 +17,7 @@ $button-font-weight: bold;
 $button-color: #FFFFFF;
 $link-font-size: 16px;
 $link-color: #0077CC;
+$header-text-color: hsl(0, 0%, 32%);
 
 // Color
 $primary-color: #0077CC;
@@ -27,7 +28,7 @@ $border-color: #CCCCCC;
 $success-color: #4CAF50;
 $warning-color: #FF9800;
 $error-color: #FF5722;
-
+$header-bg: #ffffff;
 
 @mixin flexbox($direction: row, $justify: flex-start, $align: stretch, $wrap: nowrap) {
     display: -webkit-box;
@@ -95,6 +96,13 @@ button:active {
 button:focus {
     outline: none;
 }
+
+.img-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 4px;
+}
+
 
 @mixin card-border(){
     -webkit-box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.75);

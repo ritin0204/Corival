@@ -12,3 +12,4 @@
 - Apply Validator for your Serializers
 - Fixing Contest Ranking
 - Apply React Auth More efficiently
+- When Frontend is done make minimum request for user auth

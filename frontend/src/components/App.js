@@ -20,13 +20,24 @@ import ContestResult from './ContestComponents/ContestResult';
 import ContestQuiz from './ContestComponents/ContestQuiz';
 
 import Error from './UtilsComponents/Error';
+import { useEffect, useState } from 'react';
+import { getCurrentUser } from '../requests';
 
+const static_img_url = "../../static/frontend/img";
 
 function App() {
+  const [user, setUser] = useState(null);
+  useEffect(() => {
+      let response = getCurrentUser();
+      response.then((data) => {
+          setUser(data);
+      });
+  }, []);
+  
   return (
     <div className="App">
       <BrowserRouter>
-        <Header />
+        <Header user={user}/>
         <Container>
           <Routes>
             <Route path="/" element={<Home />} />

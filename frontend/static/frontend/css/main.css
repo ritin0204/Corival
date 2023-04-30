@@ -1,1 +1,240 @@
-/*# sourceMappingURL=main.css.map */
+body {
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: "Open Sans", sans-serif;
+  font-weight: bold;
+  color: #212121;
+}
+
+p {
+  font-family: "Montserrat", sans-serif;
+  font-size: 16px;
+  color: #555555;
+}
+
+a {
+  font-family: "Montserrat", sans-serif;
+  font-size: 16px;
+  color: #0077CC;
+  text-decoration: none;
+}
+
+button {
+  font-family: "Montserrat", sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  color: #FFFFFF;
+  background-color: #0077CC;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #005999;
+}
+
+button:active {
+  background-color: #003c66;
+}
+
+button:focus {
+  outline: none;
+}
+
+.img-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 4px;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+.App {
+  margin: auto;
+  width: 100%;
+  max-width: max(90%, 1024px);
+}
+
+.header-div {
+  background-color: #aaa;
+  box-sizing: border-box;
+  width: 100%;
+  height: auto;
+  background-color: #ffffff;
+  padding: 0 16px;
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 1;
+}
+.header-div .container {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  -webkit-box-lines: nowrap;
+  flex-wrap: nowrap;
+  height: 60px;
+}
+.header-div .container .logo {
+  height: 100%;
+  width: 100px;
+}
+.header-div .container .logo img {
+  position: relative;
+  height: 150px;
+  width: 150px;
+  left: 0;
+  top: 0;
+  transform: translateY(-45px) translateX(-25px);
+}
+.header-div .container nav {
+  height: 100%;
+}
+.header-div .container nav ul {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  -webkit-box-lines: nowrap;
+  flex-wrap: nowrap;
+  list-style: none;
+}
+.header-div .container nav ul li.dropdown {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  -webkit-box-lines: nowrap;
+  flex-wrap: nowrap;
+}
+.header-div .container nav ul li.dropdown .dropdown-open {
+  display: none;
+}
+.header-div .container nav ul li.dropdown ul {
+  top: 40px;
+}
+.header-div .container nav ul li.dropdown svg {
+  margin-left: 8px;
+}
+.header-div .container nav ul li.dropdown:hover ul {
+  display: block;
+}
+.header-div .container nav ul li.dropdown:hover .dropdown-open {
+  display: block;
+}
+.header-div .container nav ul li.dropdown:hover .dropdown-close {
+  display: none;
+}
+.header-div .container nav ul li {
+  margin: 0 16px;
+}
+.header-div .container nav ul li a {
+  color: hsl(0, 0%, 32%);
+  position: relative;
+}
+.header-div .container nav ul li a:hover {
+  color: #212121;
+  font-weight: 600;
+}
+.header-div .container nav ul li ul {
+  display: none;
+  position: absolute;
+  background-color: #ffffff;
+  padding: 16px;
+  border-radius: 4px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+}
+.header-div .container nav ul li ul li {
+  margin: 8px 10px;
+}
+.header-div .container .login-link-div {
+  width: 100%;
+  text-align: end;
+}
+.header-div .container .login-link-div .login-link a {
+  margin: 0 16px;
+  color: hsl(0, 0%, 32%);
+}
+.header-div .container .login-link-div .login-link a:last-child {
+  border-radius: 12px;
+  border: 2px solid hsl(0, 0%, 32%);
+  padding: 8px 16px;
+}
+.header-div .container .login-link-div .login-link a:last-child:hover {
+  border-color: #212121;
+  color: #212121;
+}
+.header-div .container .login-link-div .login-link a:hover {
+  color: #212121;
+  font-weight: 600;
+}
+.header-div .container .login-link-div .profile-link {
+  float: right;
+  margin-right: 40px;
+}
+.header-div .container .login-link-div .profile-link .profile-img-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: rgb(58, 77, 198);
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  -webkit-box-lines: nowrap;
+  flex-wrap: nowrap;
+}
+.header-div .container .login-link-div .profile-link .profile-img-icon .dropdown-close, .header-div .container .login-link-div .profile-link .profile-img-icon .dropdown-open {
+  transform: translateX(35px);
+  position: absolute;
+}
+.header-div .container .login-link-div .profile-link .profile-img-icon .dropdown-open {
+  display: none;
+}
+.header-div .container .login-link-div .profile-link .profile-img-icon p {
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+  text-align: center;
+  margin-top: 10px;
+  transform: translateY(4px);
+}
+.header-div .container .login-link-div .profile-link .profile-img-icon ul {
+  display: none;
+  position: absolute;
+  background-color: #ffffff;
+  padding: 16px;
+  border-radius: 4px;
+  list-style: none;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+  transform: translateY(70px);
+}
+.header-div .container .login-link-div .profile-link .profile-img-icon ul li {
+  margin: 8px 10px;
+}
+.header-div .container .login-link-div .profile-link .profile-img-icon ul li a {
+  color: hsl(0, 0%, 32%);
+}
+.header-div .container .login-link-div .profile-link .profile-img-icon ul li a:hover {
+  color: #212121;
+  font-weight: 600;
+}
+.header-div .container .login-link-div .profile-link:hover .dropdown-close {
+  display: none;
+}
+.header-div .container .login-link-div .profile-link:hover .dropdown-open {
+  display: block;
+}
+.header-div .container .login-link-div .profile-link:hover ul {
+  display: block;
+}/*# sourceMappingURL=main.css.map */

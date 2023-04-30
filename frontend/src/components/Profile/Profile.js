@@ -13,6 +13,7 @@ import {
     Badge
 } from 'reactstrap';
 import { formatTimestamp } from '../../utils';
+import Error from "../UtilsComponents/Error"
 
 
 const CandidateProfile = (props) => {
@@ -54,6 +55,12 @@ const RecruiterProfile = (props) => {
 const Profile = () => {
     const location = useLocation();
     const [user, setUser] = useState(location.state);
+
+    if (user === null) {
+        return (
+            <Error status_code="401" message="Unauthorized!"/>
+        )
+    }
     return (
         <Container className='profile'>
             <Card className="my-4 mx-8" color="secondary" outline>

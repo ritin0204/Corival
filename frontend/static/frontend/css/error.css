@@ -46,6 +46,12 @@ button:focus {
   outline: none;
 }
 
+.img-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 4px;
+}
+
 .error-div {
   color: #FF5722;
   display: flex;

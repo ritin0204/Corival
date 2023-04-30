@@ -1,5 +1,4 @@
 import { useNavigate } from "react-router-dom";
-import { Button } from "reactstrap";
 import fetchRequest, { setCurrentUser } from "../../requests";
 
 export default function Logout() {
@@ -16,6 +15,6 @@ export default function Logout() {
         });
     }
     return (
-        <Button size='sm' color="secondary" className="float-right my-2 mx-2" style={{ width: 100 }} onClick={logOut}>Logout</Button>
+        <span onClick={logOut}>Logout</span>
     );
 }

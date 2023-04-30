@@ -28,6 +28,7 @@ export default function Login() {
         fetchRequest(`/${path}`, 'post', data)
         .then(response => {
             if (response.status === 200) {
+                window.location = '/';
                 navigate('/');
             }
         })
