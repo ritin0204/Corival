@@ -3,6 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 
 from django.contrib.auth import login,logout,authenticate
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
 
 from rest_framework.response import Response
 from rest_framework.decorators import action
@@ -61,6 +62,9 @@ def logout_view(request):
 @method_decorator(csrf_exempt, name='dispatch')
 class AuthView(APIView):
     template_name = 'frontend/index.html'
+    
+    def get(self, request):
+        return render(request, self.template_name)
     
     def post(self,request):
         username = request.POST['username']

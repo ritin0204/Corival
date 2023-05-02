@@ -27,7 +27,7 @@ function Header(args) {
                         <li>
                             <Link to={"/"}>Home</Link>
                         </li>
-                        <li class="dropdown"><Link aria-disabled>Features</Link>
+                        <li className="dropdown"><Link aria-disabled>Features</Link>
                             <ul>
                                 <li>
                                     <img src={static_img_url + "/study.svg"} className="img-icon" alt="Learn Icon"></img>
@@ -49,7 +49,7 @@ function Header(args) {
                                 <path stroke="#686868" fill="none" d="m1 5 4-4 4 4" />
                             </svg>
                         </li>
-                        <li class="dropdown"><Link aria-disabled>Company</Link>
+                        <li className="dropdown"><Link aria-disabled>Company</Link>
                             <ul>
                                 <li>
                                     <img src={static_img_url+"/info.png"} className="img-icon" alt="Learn Icon"></img>

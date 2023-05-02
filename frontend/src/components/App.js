@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Header from './Header';
+import Footer from './Footer';
 import Home from './Home';
 import Login from './AuthComponents/Login';
 import CandidateSignup from './AuthComponents/CandidateSignup';
@@ -60,11 +61,12 @@ function App() {
             <Route path="/contest/:id/quiz/" element={<ContestQuiz />} />
             <Route path="/contest/:id/results" element={ <ContestDetails/>} />
             <Route path="/contest/:id/results/:user" element={<ContestResult />} />
-
+            
             {/* 404 */}
             <Route path="/*" element={<Error status_code="404" message="Not Found!" />} />
           </Routes>
         </Container>
+        <Footer/>
       </BrowserRouter>
     </div>
   );
