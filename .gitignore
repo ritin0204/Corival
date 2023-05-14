@@ -2,7 +2,6 @@
 /corival/file
 /corival/__pycache__
 
-db.sqlite3
 *.sh
 *.pyc
 .env
