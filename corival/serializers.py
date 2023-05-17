@@ -210,8 +210,8 @@ class PracticeSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         
         global NUMBER_OF_QUESTIONS_IN_PRACTICE
-        
-        apptitudeObj = QuestionSetter(validated_data['category'], validated_data['difficulty'], NUMBER_OF_QUESTIONS_IN_PRACTICE)
+        NUMBER_OF_QUESTIONS_IN_PRACTICE = 3
+        apptitudeObj = QuestionSetter(category= validated_data['category'], difficulty= validated_data['difficulty'],N= NUMBER_OF_QUESTIONS_IN_PRACTICE)
         validated_data['end_time'] = apptitudeObj.end_time
         apptitude = apptitudeObj.apptitude
         

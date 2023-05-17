@@ -3,7 +3,7 @@ import datetime, random
 
 
 class QuestionSetter():
-    def __init__(self, category="All", difficulty=1, N=0, start_time=datetime.datetime.now()):
+    def __init__(self, category="All", difficulty=1, N=3, start_time=datetime.datetime.now()):
         self.category = category
         self.difficulty = difficulty
         self.start_time = start_time
@@ -51,7 +51,7 @@ class QuestionSetter():
             answer_position = int(line[5])
             category = line[6]
             difficulty = int(line[7])
-            added_by = User.objects.get(username="hr")
+            added_by = User.objects.get(username="ritin0204")
             try:
                 apptitude = Apptitude.objects.create(question=question, answer_position=answer_position, category=category, difficulty=difficulty, added_by=added_by)
                     

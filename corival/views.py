@@ -17,6 +17,7 @@ from rest_framework import viewsets
 from .serializers import *
 from .models import *
 from .permissions import *
+from .utlis import *
 import datetime, pytz
 
 utc=pytz.UTC
@@ -54,6 +55,8 @@ def current_user(request):
 @login_required
 def logout_view(request):
     if request.method == "POST":
+        # que = QuestionSetter()
+        # que.upload_questions()
         logout(request)
         return JsonResponse({"success":"Logged out successfully"},status=200)
     return JsonResponse({"error":"Invalid request"},status=400)
