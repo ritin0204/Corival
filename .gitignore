@@ -1,7 +1,7 @@
 /__pycache__
 /corival/file
 /corival/__pycache__
-/frontend/node_modules
+
 *.sh
 *.pyc
 .env
