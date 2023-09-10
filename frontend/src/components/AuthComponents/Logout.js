@@ -4,7 +4,7 @@ import fetchRequest, { setCurrentUser } from "../../requests";
 export default function Logout() {
     const navigate = useNavigate();
     const logOut = () => {
-        fetchRequest('/logout', 'post')
+        fetchRequest('/logout')
         .then(response => {
             setCurrentUser(null);
             window.location = '/';

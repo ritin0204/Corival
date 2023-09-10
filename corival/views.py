@@ -54,13 +54,9 @@ def current_user(request):
 
 @login_required
 def logout_view(request):
-    if request.method == "POST":
-        # que = QuestionSetter()
-        # que.upload_questions()
-        logout(request)
-        return JsonResponse({"success":"Logged out successfully"},status=200)
-    return JsonResponse({"error":"Invalid request"},status=400)
-   
+    logout(request)
+    return JsonResponse({"success":"Logged out successfully"},status=200)
+
 
 @method_decorator(csrf_exempt, name='dispatch')
 class AuthView(APIView):

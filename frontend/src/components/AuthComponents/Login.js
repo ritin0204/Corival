@@ -24,6 +24,7 @@ export default function Login() {
         })
         .catch(error => {
             document.getElementById('submission-alert').innerHTML = error.response.data.error;
+            console.log(error);
             document.getElementById('submission-alert').classList.remove('d-none');
         });
     }

@@ -13,3 +13,5 @@
 - Fixing Contest Ranking
 - Apply React Auth More efficiently
 - When Frontend is done make minimum request for user auth
+
+"""Feel Free To Participate in the development of this project and let's connnect for further details"""
