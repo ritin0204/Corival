@@ -71,7 +71,6 @@ const Intro = () => {
                 <div className="register-now-details">
                     <h2>Register Now</h2>
                     <p>
-                        Prepare for your dream job with our quiz and contest platform. Get discovered by top recruiters or hire top candidates based on their scores.
                     </p>
                     <Link to={"/register"}>
                         <button>

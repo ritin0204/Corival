@@ -6,7 +6,6 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 
 from rest_framework.response import Response
-from rest_framework.decorators import action
 from rest_framework.views import APIView
 
 from django.contrib.auth.models import User
@@ -19,6 +18,7 @@ from .models import *
 from .permissions import *
 from .utlis import *
 import datetime, pytz
+import re
 
 utc=pytz.UTC
 # Create your views here.
@@ -68,13 +68,22 @@ class AuthView(APIView):
     def post(self,request):
         username = request.POST['username']
         password = request.POST['password']
+        
+        # Email check
+        regex = r'\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,7}\b'
+        if re.fullmatch(regex, username):
+            try:
+                username = User.objects.get(email=username).username
+            except User.DoesNotExist:
+                return JsonResponse({"error":"Email is Not registered!"},status=400)
+            
         user = authenticate(username=username,password=password)
         if user is not None:
             login(request,user)
             userData = UserSerializer(instance=user,many=False)
             return Response(userData.data,status=200)
         else:
-            return JsonResponse({"error":"Invalid Username or password"},status=400)
+            return JsonResponse({"error":"Invalid Credentials! Please try again."},status=400)
 
 
 class UserViewSet(viewsets.ModelViewSet):

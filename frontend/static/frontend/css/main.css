@@ -642,4 +642,31 @@ footer p {
 }
 .login-page .login-div .social-login a:focus {
   outline: none;
+}
+
+.register-page {
+  min-height: 60vh;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  align-items: start;
+  -webkit-box-lines: nowrap;
+  flex-wrap: nowrap;
+}
+.register-page .card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  align-items: start;
+  -webkit-box-lines: nowrap;
+  flex-wrap: nowrap;
+  border-radius: 12px;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+  padding: 2%;
+  margin: 10px;
+  font-size: 1.1rem;
+}
+.register-page .card p {
+  font-size: 0.9rem;
 }/*# sourceMappingURL=main.css.map */

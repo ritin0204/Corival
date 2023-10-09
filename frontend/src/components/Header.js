@@ -96,7 +96,7 @@ function Header(args) {
                         ) : (
                             <div className="login-link">
                                 <Link to={"/login"}>Login</Link>
-                                <Link to={"/candidates/register"}>Register</Link>
+                                <Link to={"/register"}>Register</Link>
                             </div>
                         )
                     }

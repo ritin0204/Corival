@@ -23,8 +23,8 @@ import ContestQuiz from './ContestComponents/ContestQuiz';
 import Error from './UtilsComponents/Error';
 import { useEffect, useState } from 'react';
 import { getCurrentUser } from '../requests';
+import SignUp from './AuthComponents/SignUp';
 
-const static_img_url = "../../static/frontend/img";
 
 function App() {
   const [user, setUser] = useState(null);
@@ -46,6 +46,7 @@ function App() {
             {/* Auth */}
             <Route path="/login" element={<Login />} />
             <Route path="/profile" element={<Profile/>} />
+            <Route path='/register' element={<SignUp/>} />
             <Route path="/candidates/register" element={<CandidateSignup />} />
             <Route path="/recruiters/register" element={<RecruiterSignup />} />
 

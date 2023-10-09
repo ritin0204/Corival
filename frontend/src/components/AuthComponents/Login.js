@@ -48,8 +48,8 @@ export default function Login() {
             <h3>Log In</h3>
             <form className='form-div' onSubmit={(e) => { handleSubmit(e, "login", formData) }}>
                 <div className='form-group'>
-                    <label htmlFor="username">Email</label>
-                    <input className='form-control' type="text" name="username" id="username" placeholder="Username" onChange={handleChange} />
+                    <label htmlFor="username">Username/Email</label>
+                    <input className='form-control' type="text" name="username" id="username" placeholder="Username or Email" onChange={handleChange} />
                 </div>
                 <div className='form-group'>
                     <label htmlFor="password">Password</label>

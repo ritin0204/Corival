@@ -5,6 +5,7 @@ body {
     padding: 0;
     overflow-x: hidden;
 }
+
 .App {
     margin: auto;
     width: 100%;
@@ -481,4 +482,24 @@ footer {
             }
         }
     }
+}
+
+.register-page {
+    min-height: 60vh;
+    margin-bottom: 20px;
+    @include flexbox(row, space-evenly, start);
+
+    .card {
+        @include flexbox(column, space-evenly, start);
+        border-radius: 12px;
+        box-shadow: 0 0 8px rgba(0, 0, 0, 0.2);
+        padding: 2%;
+        margin: 10px;
+        font-size: 1.1rem;
+
+        p {
+            font-size: 0.9rem;
+        }
+    }
+
 }
